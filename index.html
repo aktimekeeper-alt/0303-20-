@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Burnout App - Apple UI Test Demo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(180deg, #000000 0%, #0a1929 50%, #000000 100%);
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            width: 100%;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .logo {
+            font-size: 72px;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            font-size: 48px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            letter-spacing: -0.5px;
+        }
+
+        .subtitle {
+            font-size: 20px;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 8px;
+        }
+
+        .tagline {
+            font-size: 17px;
+            color: rgba(0, 122, 255, 0.9);
+            font-weight: 500;
+        }
+
+        .demo-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+            margin-bottom: 60px;
+        }
+
+        .demo-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 32px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            color: white;
+            display: block;
+            box-shadow: 0px 8px 24px rgba(0, 0, 0, 0.2);
+        }
+
+        .demo-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0px 16px 40px rgba(0, 122, 255, 0.3);
+            border-color: rgba(0, 122, 255, 0.5);
+        }
+
+        .demo-card:active {
+            transform: translateY(-4px);
+        }
+
+        .demo-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+
+        .demo-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .demo-description {
+            font-size: 15px;
+            color: rgba(255, 255, 255, 0.7);
+            line-height: 1.5;
+            margin-bottom: 16px;
+        }
+
+        .demo-features {
+            list-style: none;
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .demo-features li {
+            padding: 4px 0;
+        }
+
+        .demo-features li:before {
+            content: "✓ ";
+            color: #34C759;
+            font-weight: bold;
+            margin-right: 8px;
+        }
+
+        .info-section {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 40px;
+            margin-bottom: 40px;
+        }
+
+        .info-section h2 {
+            font-size: 28px;
+            margin-bottom: 20px;
+            color: #007AFF;
+        }
+
+        .info-section p {
+            font-size: 17px;
+            line-height: 1.6;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 16px;
+        }
+
+        .tech-stack {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .tech-badge {
+            padding: 8px 16px;
+            background: rgba(0, 122, 255, 0.2);
+            border: 1px solid rgba(0, 122, 255, 0.3);
+            border-radius: 20px;
+            font-size: 14px;
+            color: #007AFF;
+            font-weight: 500;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 40px 0;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 15px;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 36px;
+            }
+
+            .demo-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">🚗💨</div>
+            <h1>Burnout App</h1>
+            <p class="subtitle">Apple-Style 3D UI Test Demos</p>
+            <p class="tagline">The Gen Z Car Enthusiast Social Network</p>
+        </div>
+
+        <div class="info-section">
+            <h2>📱 Interactive Demos</h2>
+            <p>Explore our Apple-inspired UI components with realistic car enthusiast test data. Each demo showcases glassmorphism, multi-layer shadows, smooth animations, and depth effects.</p>
+            <p>Click any card below to view the interactive demo. All demos work in any modern browser with no installation required.</p>
+        </div>
+
+        <div class="demo-grid">
+            <a href="home-feed.html" class="demo-card">
+                <div class="demo-icon">🏠</div>
+                <div class="demo-title">Home Feed</div>
+                <div class="demo-description">
+                    Social feed with posts, search, and stats
+                </div>
+                <ul class="demo-features">
+                    <li>Content cards with images</li>
+                    <li>Glassmorphic search bar</li>
+                    <li>Real-time stats display</li>
+                    <li>Interactive filters</li>
+                </ul>
+            </a>
+
+            <a href="profile.html" class="demo-card">
+                <div class="demo-icon">👤</div>
+                <div class="demo-title">User Profile</div>
+                <div class="demo-description">
+                    Apple Wallet-style profile cards with car details
+                </div>
+                <ul class="demo-features">
+                    <li>3D card rotation effect</li>
+                    <li>Car stats & modifications</li>
+                    <li>QR code integration</li>
+                    <li>Tap to expand animation</li>
+                </ul>
+            </a>
+
+            <a href="routes.html" class="demo-card">
+                <div class="demo-icon">🗺️</div>
+                <div class="demo-title">Routes & Map</div>
+                <div class="demo-description">
+                    Map view with floating HUD and communication
+                </div>
+                <ul class="demo-features">
+                    <li>Routes HUD with stats</li>
+                    <li>Push-to-talk interface</li>
+                    <li>Active user indicators</li>
+                    <li>Expandable route details</li>
+                </ul>
+            </a>
+
+            <a href="chat.html" class="demo-card">
+                <div class="demo-icon">💬</div>
+                <div class="demo-title">Messages</div>
+                <div class="demo-description">
+                    Chat interface with glass design
+                </div>
+                <ul class="demo-features">
+                    <li>Conversation list</li>
+                    <li>Glass message bubbles</li>
+                    <li>Typing indicators</li>
+                    <li>Smooth transitions</li>
+                </ul>
+            </a>
+
+            <a href="events.html" class="demo-card">
+                <div class="demo-icon">📅</div>
+                <div class="demo-title">Events</div>
+                <div class="demo-description">
+                    Car meets and events with RSVP
+                </div>
+                <ul class="demo-features">
+                    <li>Event cards with details</li>
+                    <li>Location & time info</li>
+                    <li>Attendee count</li>
+                    <li>RSVP functionality</li>
+                </ul>
+            </a>
+
+            <a href="components.html" class="demo-card">
+                <div class="demo-icon">🧩</div>
+                <div class="demo-title">All Components</div>
+                <div class="demo-description">
+                    Complete component showcase
+                </div>
+                <ul class="demo-features">
+                    <li>All UI elements</li>
+                    <li>Buttons & controls</li>
+                    <li>Modals & dialogs</li>
+                    <li>Interactive examples</li>
+                </ul>
+            </a>
+        </div>
+
+        <div class="info-section">
+            <h2>✨ Features</h2>
+            <p><strong>Glassmorphism:</strong> Backdrop blur effects with semi-transparent backgrounds create depth and visual hierarchy.</p>
+            <p><strong>Multi-Layer Shadows:</strong> Carefully crafted shadow systems provide realistic elevation and 3D depth.</p>
+            <p><strong>Smooth Animations:</strong> Spring physics and elastic transitions at 60fps for native-feeling interactions.</p>
+            <p><strong>Haptic Feedback:</strong> Visual and interactive feedback on all touch interactions.</p>
+
+            <div class="tech-stack">
+                <span class="tech-badge">Glassmorphism</span>
+                <span class="tech-badge">Backdrop Blur</span>
+                <span class="tech-badge">CSS Animations</span>
+                <span class="tech-badge">Spring Physics</span>
+                <span class="tech-badge">Responsive Design</span>
+                <span class="tech-badge">Touch Optimized</span>
+            </div>
+        </div>
+
+        <div class="info-section">
+            <h2>🎯 Design Inspiration</h2>
+            <p>These components are inspired by Apple's design language:</p>
+            <ul class="demo-features">
+                <li>iOS Control Center (glassmorphism effects)</li>
+                <li>Apple Wallet (card stacking and 3D rotation)</li>
+                <li>Apple Maps (floating HUD overlays)</li>
+                <li>iOS App Icons (depth and shadow system)</li>
+                <li>Apple Music (card-based layouts)</li>
+            </ul>
+        </div>
+
+        <div class="footer">
+            <p>🍎 Apple-Style 3D UI Components for Burnout</p>
+            <p>Built with HTML, CSS, and JavaScript • No frameworks required</p>
+            <p style="margin-top: 20px; color: rgba(255,255,255,0.4);">
+                For Flutter implementation, see the flutter_burnout/ directory
+            </p>
+        </div>
+    </div>
+
+    <script>
+        // Add smooth scroll behavior
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+
+        // Add entrance animations
+        document.addEventListener('DOMContentLoaded', () => {
+            const cards = document.querySelectorAll('.demo-card');
+            cards.forEach((card, index) => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+                setTimeout(() => {
+                    card.style.transition = 'all 0.6s cubic-bezier(0.4, 0, 0.2, 1)';
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, index * 100);
+            });
+        });
+    </script>
+</body>
+</html>

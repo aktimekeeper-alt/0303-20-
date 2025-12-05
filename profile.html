@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile - Burnout</title>
+    <link rel="stylesheet" href="shared-styles.css">
+</head>
+<body>
+    <div class="phone-frame">
+        <div class="status-bar">
+            <span>9:41</span>
+            <div class="status-icons">
+                <span>📶</span>
+                <span>📡</span>
+                <span>🔋</span>
+            </div>
+        </div>
+
+        <div class="app-header">
+            <h1>Profile</h1>
+            <button class="btn-icon" onclick="showToast('Settings')">⚙️</button>
+        </div>
+
+        <div class="content">
+            <div class="section-title">My Garage</div>
+
+            <!-- Profile Card -->
+            <div id="profileCard"></div>
+
+            <!-- Stats Grid -->
+            <div class="section-title" style="margin-top: 32px;">Statistics</div>
+            <div class="stats-grid" id="statsGrid"></div>
+
+            <!-- Modifications List -->
+            <div class="section-title" style="margin-top: 32px;">Modifications</div>
+            <div id="modsList"></div>
+        </div>
+
+<!-- Bottom Nav -->
+        <nav class="bottom-nav">
+            <div class="nav-item" onclick="window.location.href='home-feed.html'">
+                <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+                <span class="nav-label">Home</span>
+            </div>
+            <div class="nav-item" onclick="window.location.href='chat.html'">
+                <svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg>
+                <span class="nav-label">Chat</span>
+            </div>
+            <div class="nav-item" onclick="window.location.href='events.html'">
+		<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640"><!--!Font Awesome Free v7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2025 Fonticons, Inc.--><path d="M352 128C352 110.3 337.7 96 320 96C302.3 96 288 110.3 288 128L288 288L128 		288C110.3 288 96 302.3 96 320C96 337.7 110.3 352 128 352L288 352L288 512C288 529.7 302.3 544 320 544C337.7 544 352 529.7 352 512L352 352L512 352C529.7 352 544 337.7 544 320C544 302.3 529.7 288 512 288L352 288L352 128z"/></svg>
+                <span class="nav-label">Posts</span>
+            </div>
+            <div class="nav-item" onclick="window.location.href='routes.html'">
+                <svg viewBox="0 0 24 24"><path d="M20.5 3l-.16.03L15 5.1 9 3 3.36 4.9c-.21.07-.36.25-.36.48V20.5c0 .28.22.5.5.5l.16-.03L9 18.9l6 2.1 5.64-1.9c.21-.07.36-.25.36-.48V3.5c0-.28-.22-.5-.5-.5zM15 19l-6-2.11V5l6 2.11V19z"/></svg>
+                <span class="nav-label">Routes</span>
+            </div>
+
+            <div class="nav-item active">
+                <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                <span class="nav-label">Profile</span>
+            </div>
+        </nav>
+    </div>
+
+
+    <script src="data.js"></script>
+    <script src="app.js"></script>
+    <script>
+        const profile = profiles[0];
+
+        // Render Profile Card
+        document.getElementById('profileCard').innerHTML = `
+            <div style="background: linear-gradient(135deg, rgba(0, 122, 255, 0.3), rgba(0, 81, 213, 0.5));
+                        border-radius: 20px;
+                        padding: 24px;
+                        border: 1px solid rgba(255,255,255,0.2);
+                        box-shadow: 0 20px 40px rgba(0, 122, 255, 0.2);
+                        margin-bottom: 20px;
+                        cursor: pointer;"
+                 onclick="showToast('View QR Code')">
+                <div style="margin-bottom: 60px;">
+                    <div style="font-size: 32px; font-weight: 700; margin-bottom: 8px;">
+                        ${profile.carModel}
+                    </div>
+                    <div style="font-size: 17px; color: rgba(255,255,255,0.8);">
+                        ${profile.year}
+                    </div>
+                    <div style="font-size: 15px; color: rgba(255,255,255,0.6); margin-top: 4px;">
+                        ${profile.username}
+                    </div>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                    <div style="background: rgba(255,255,255,0.1); backdrop-filter: blur(5px); border: 1px solid rgba(255,255,255,0.2); border-radius: 12px; padding: 12px;">
+                        <div style="font-size: 11px; color: rgba(255,255,255,0.6); text-transform: uppercase;">HP</div>
+                        <div style="font-size: 24px; font-weight: 700;">${profile.horsePower}</div>
+                    </div>
+                    <div style="background: rgba(255,255,255,0.1); backdrop-filter: blur(5px); border: 1px solid rgba(255,255,255,0.2); border-radius: 12px; padding: 12px;">
+                        <div style="font-size: 11px; color: rgba(255,255,255,0.6); text-transform: uppercase;">TOP</div>
+                        <div style="font-size: 24px; font-weight: 700;">${profile.topSpeed} mph</div>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        // Render Stats
+        const stats = [
+            { icon: '📊', value: profile.stats.posts, label: 'Posts', color: 'rgba(0, 122, 255, 0.2)' },
+            { icon: '👥', value: formatNumber(profile.stats.followers), label: 'Followers', color: 'rgba(52, 199, 89, 0.2)' },
+            { icon: '🏁', value: profile.stats.meetsAttended, label: 'Meets', color: 'rgba(255, 59, 48, 0.2)' },
+            { icon: '⏱️', value: profile.stats.trackDays, label: 'Track Days', color: 'rgba(175, 82, 222, 0.2)' }
+        ];
+
+        document.getElementById('statsGrid').innerHTML = stats.map(stat => `
+            <div class="stat-display" onclick="showToast('View ${stat.label}')">
+                <div class="stat-display-icon" style="background: ${stat.color};">${stat.icon}</div>
+                <div class="stat-display-value">${stat.value}</div>
+                <div class="stat-display-label">${stat.label}</div>
+            </div>
+        `).join('');
+
+        // Render Mods List
+        document.getElementById('modsList').innerHTML = profile.mods.map((mod, index) => `
+            <div class="content-card" style="margin-bottom: 12px;" onclick="showToast('${mod}')">
+                <div class="card-content" style="padding: 16px;">
+                    <div style="display: flex; align-items: center; gap: 16px;">
+                        <div style="font-size: 32px;">🔧</div>
+                        <div style="flex: 1;">
+                            <div class="card-title" style="margin-bottom: 4px; font-size: 16px;">
+                                ${mod}
+                            </div>
+                            <div class="card-subtitle" style="margin: 0;">
+                                Modification ${index + 1} of ${profile.mods.length}
+                            </div>
+                        </div>
+                        <div style="font-size: 20px; opacity: 0.5;">›</div>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+    </script>
+</body>
+</html>
