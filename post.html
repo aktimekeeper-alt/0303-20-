@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Post - Burnout</title>
+    <link rel="stylesheet" href="shared-styles.css">
+    <style>
+        .post-form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .form-label {
+            font-size: 14px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.8);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .form-input {
+            padding: 16px;
+            border-radius: 16px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            font-size: 16px;
+            font-family: inherit;
+            transition: all 0.2s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: rgba(0, 122, 255, 0.6);
+            box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.2);
+        }
+
+        .form-input::placeholder {
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        .form-textarea {
+            min-height: 120px;
+            resize: none;
+        }
+
+        .image-upload {
+            height: 180px;
+            border-radius: 16px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px dashed rgba(255, 255, 255, 0.2);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .image-upload:hover {
+            border-color: rgba(0, 122, 255, 0.5);
+            background: rgba(0, 122, 255, 0.1);
+        }
+
+        .image-upload-icon {
+            font-size: 48px;
+            opacity: 0.6;
+        }
+
+        .image-upload-text {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .category-selector {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        .category-option {
+            padding: 16px;
+            border-radius: 16px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .category-option:hover {
+            background: rgba(255, 255, 255, 0.12);
+        }
+
+        .category-option.selected {
+            border-color: #007AFF;
+            background: rgba(0, 122, 255, 0.2);
+        }
+
+        .category-icon {
+            font-size: 28px;
+        }
+
+        .category-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 18px;
+            border-radius: 16px;
+            background: linear-gradient(135deg, #007AFF, #0051D5);
+            border: none;
+            color: white;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 8px 24px rgba(0, 122, 255, 0.3);
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 32px rgba(0, 122, 255, 0.4);
+        }
+
+        .submit-btn:active {
+            transform: scale(0.98);
+        }
+
+        .char-count {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.4);
+            text-align: right;
+            margin-top: -4px;
+        }
+
+        .tags-input-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            padding: 12px;
+            border-radius: 16px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            min-height: 52px;
+            align-items: center;
+        }
+
+        .tag-chip {
+            padding: 6px 12px;
+            background: rgba(0, 122, 255, 0.3);
+            border: 1px solid rgba(0, 122, 255, 0.5);
+            border-radius: 20px;
+            font-size: 14px;
+            color: #007AFF;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .tag-chip .remove {
+            cursor: pointer;
+            opacity: 0.7;
+            font-size: 12px;
+        }
+
+        .tag-chip .remove:hover {
+            opacity: 1;
+        }
+
+        .tags-input {
+            flex: 1;
+            min-width: 100px;
+            background: none;
+            border: none;
+            outline: none;
+            color: white;
+            font-size: 14px;
+        }
+
+        .tags-input::placeholder {
+            color: rgba(255, 255, 255, 0.4);
+        }
+    </style>
+</head>
+<body>
+    <div class="phone-frame">
+        <div class="status-bar">
+            <span>9:41</span>
+            <div class="status-icons">
+                <span>📶</span>
+                <span>📡</span>
+                <span>🔋</span>
+            </div>
+        </div>
+
+        <div class="app-header">
+            <h1>Create Post</h1>
+            <button class="btn-icon" onclick="showToast('Drafts')">📝</button>
+        </div>
+
+        <div class="content">
+            <form class="post-form" id="postForm">
+                <!-- Category Selection -->
+                <div class="form-group">
+                    <label class="form-label">Category</label>
+                    <div class="category-selector" id="categorySelector">
+                        <div class="category-option selected" data-category="builds">
+                            <span class="category-icon">🔧</span>
+                            <span class="category-name">Builds</span>
+                        </div>
+                        <div class="category-option" data-category="meets">
+                            <span class="category-icon">🏁</span>
+                            <span class="category-name">Meets</span>
+                        </div>
+                        <div class="category-option" data-category="racing">
+                            <span class="category-icon">⚡</span>
+                            <span class="category-name">Racing</span>
+                        </div>
+                        <div class="category-option" data-category="photos">
+                            <span class="category-icon">📸</span>
+                            <span class="category-name">Photos</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Image Upload -->
+                <div class="form-group">
+                    <label class="form-label">Photo</label>
+                    <div class="image-upload" onclick="showToast('Opening camera roll...')">
+                        <span class="image-upload-icon">📷</span>
+                        <span class="image-upload-text">Tap to add a photo</span>
+                    </div>
+                </div>
+
+                <!-- Title -->
+                <div class="form-group">
+                    <label class="form-label">Title</label>
+                    <input type="text" class="form-input" id="postTitle" placeholder="What's your post about?" maxlength="100">
+                    <div class="char-count"><span id="titleCount">0</span>/100</div>
+                </div>
+
+                <!-- Description -->
+                <div class="form-group">
+                    <label class="form-label">Description</label>
+                    <textarea class="form-input form-textarea" id="postDescription" placeholder="Share the details..." maxlength="500"></textarea>
+                    <div class="char-count"><span id="descCount">0</span>/500</div>
+                </div>
+
+                <!-- Tags -->
+                <div class="form-group">
+                    <label class="form-label">Tags</label>
+                    <div class="tags-input-container" id="tagsContainer">
+                        <input type="text" class="tags-input" id="tagsInput" placeholder="Add tags...">
+                    </div>
+                </div>
+
+                <!-- Submit Button -->
+                <button type="submit" class="submit-btn">Post</button>
+            </form>
+        </div>
+
+        <!-- Bottom Nav -->
+        <nav class="bottom-nav">
+            <div class="nav-item" onclick="window.location.href='home-feed.html'">
+                <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+                <span class="nav-label">Home</span>
+            </div>
+            <div class="nav-item" onclick="window.location.href='chat.html'">
+                <svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg>
+                <span class="nav-label">Chat</span>
+            </div>
+            <div class="nav-item active">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640"><path d="M352 128C352 110.3 337.7 96 320 96C302.3 96 288 110.3 288 128L288 288L128 288C110.3 288 96 302.3 96 320C96 337.7 110.3 352 128 352L288 352L288 512C288 529.7 302.3 544 320 544C337.7 544 352 529.7 352 512L352 352L512 352C529.7 352 544 337.7 544 320C544 302.3 529.7 288 512 288L352 288L352 128z"/></svg>
+                <span class="nav-label">Post</span>
+            </div>
+            <div class="nav-item" onclick="window.location.href='routes.html'">
+                <svg viewBox="0 0 24 24"><path d="M20.5 3l-.16.03L15 5.1 9 3 3.36 4.9c-.21.07-.36.25-.36.48V20.5c0 .28.22.5.5.5l.16-.03L9 18.9l6 2.1 5.64-1.9c.21-.07.36-.25.36-.48V3.5c0-.28-.22-.5-.5-.5zM15 19l-6-2.11V5l6 2.11V19z"/></svg>
+                <span class="nav-label">Routes</span>
+            </div>
+            <div class="nav-item" onclick="window.location.href='profile.html'">
+                <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                <span class="nav-label">Profile</span>
+            </div>
+        </nav>
+    </div>
+
+    <script src="app.js"></script>
+    <script>
+        // Category selection
+        const categoryOptions = document.querySelectorAll('.category-option');
+        let selectedCategory = 'builds';
+
+        categoryOptions.forEach(option => {
+            option.addEventListener('click', function() {
+                categoryOptions.forEach(o => o.classList.remove('selected'));
+                this.classList.add('selected');
+                selectedCategory = this.dataset.category;
+            });
+        });
+
+        // Character counters
+        const titleInput = document.getElementById('postTitle');
+        const descInput = document.getElementById('postDescription');
+        const titleCount = document.getElementById('titleCount');
+        const descCount = document.getElementById('descCount');
+
+        titleInput.addEventListener('input', () => {
+            titleCount.textContent = titleInput.value.length;
+        });
+
+        descInput.addEventListener('input', () => {
+            descCount.textContent = descInput.value.length;
+        });
+
+        // Tags functionality
+        const tagsContainer = document.getElementById('tagsContainer');
+        const tagsInput = document.getElementById('tagsInput');
+        const tags = [];
+
+        tagsInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' || e.key === ',') {
+                e.preventDefault();
+                const tag = this.value.trim().replace(/,/g, '');
+                if (tag && tags.length < 5 && !tags.includes(tag)) {
+                    tags.push(tag);
+                    renderTags();
+                }
+                this.value = '';
+            }
+        });
+
+        function renderTags() {
+            const existingChips = tagsContainer.querySelectorAll('.tag-chip');
+            existingChips.forEach(chip => chip.remove());
+
+            tags.forEach((tag, index) => {
+                const chip = document.createElement('span');
+                chip.className = 'tag-chip';
+                chip.innerHTML = `#${tag} <span class="remove" onclick="removeTag(${index})">✕</span>`;
+                tagsContainer.insertBefore(chip, tagsInput);
+            });
+        }
+
+        function removeTag(index) {
+            tags.splice(index, 1);
+            renderTags();
+        }
+
+        // Form submission
+        document.getElementById('postForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const title = titleInput.value.trim();
+            const description = descInput.value.trim();
+
+            if (!title) {
+                showToast('Please add a title');
+                return;
+            }
+
+            showToast('Post created successfully!');
+
+            // Reset form after short delay
+            setTimeout(() => {
+                titleInput.value = '';
+                descInput.value = '';
+                titleCount.textContent = '0';
+                descCount.textContent = '0';
+                tags.length = 0;
+                renderTags();
+            }, 1000);
+        });
+    </script>
+</body>
+</html>
