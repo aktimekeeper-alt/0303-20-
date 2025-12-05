@@ -1,0 +1,1105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apple 3D UI Components - Test Demo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(180deg, #000000 0%, #0a1929 50%, #000000 100%);
+            color: white;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 430px;
+            margin: 0 auto;
+            padding: 20px;
+            padding-bottom: 140px;
+        }
+
+        /* ============================================================================
+           HEADER
+        ============================================================================ */
+        .header {
+            padding: 40px 20px 20px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            letter-spacing: 0.374px;
+        }
+
+        .header p {
+            font-size: 17px;
+            color: rgba(255, 255, 255, 0.7);
+            letter-spacing: -0.408px;
+        }
+
+        /* ============================================================================
+           GLASS EFFECT BASE
+        ============================================================================ */
+        .glass {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .glass-dark {
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        /* ============================================================================
+           SECTIONS
+        ============================================================================ */
+        .section {
+            margin-bottom: 32px;
+        }
+
+        .section-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: white;
+            letter-spacing: 0.38px;
+        }
+
+        /* ============================================================================
+           BUTTONS
+        ============================================================================ */
+        .button-group {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .btn {
+            height: 50px;
+            border-radius: 12px;
+            border: none;
+            font-size: 17px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            letter-spacing: -0.408px;
+        }
+
+        .btn:active {
+            transform: scale(0.95);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #007AFF 0%, #0051D5 100%);
+            color: white;
+            box-shadow: 0px 8px 20px rgba(0, 122, 255, 0.3);
+        }
+
+        .btn-primary:hover {
+            box-shadow: 0px 12px 24px rgba(0, 122, 255, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1), 0px 8px 16px rgba(0, 0, 0, 0.08);
+        }
+
+        .btn-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1), 0px 8px 16px rgba(0, 0, 0, 0.08);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: transform 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .btn-icon:active {
+            transform: scale(0.9);
+        }
+
+        .btn-pills {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 12px;
+        }
+
+        .btn-pill {
+            padding: 8px 16px;
+            border-radius: 20px;
+            border: 1px solid rgba(0, 122, 255, 0.3);
+            background: rgba(0, 122, 255, 0.2);
+            color: #007AFF;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .btn-pill.active {
+            background: #007AFF;
+            color: white;
+            box-shadow: 0px 8px 20px rgba(0, 122, 255, 0.3);
+        }
+
+        /* ============================================================================
+           SEARCH BAR
+        ============================================================================ */
+        .search-bar {
+            height: 48px;
+            border-radius: 24px;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            padding: 0 16px;
+            gap: 12px;
+            box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1), 0px 8px 16px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+        }
+
+        .search-bar:focus-within {
+            border-color: rgba(0, 122, 255, 0.5);
+            border-width: 2px;
+            padding: 0 15px;
+            box-shadow: 0px 0px 12px rgba(0, 122, 255, 0.2);
+            transform: scale(1.02);
+        }
+
+        .search-bar input {
+            flex: 1;
+            background: none;
+            border: none;
+            outline: none;
+            color: white;
+            font-size: 16px;
+        }
+
+        .search-bar input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .search-icon {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 20px;
+        }
+
+        .clear-btn {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 14px;
+            opacity: 0;
+            transition: opacity 0.15s ease;
+        }
+
+        .search-bar.has-text .clear-btn {
+            opacity: 1;
+        }
+
+        /* ============================================================================
+           PROFILE CARD (APPLE WALLET STYLE)
+        ============================================================================ */
+        .profile-card {
+            position: relative;
+            height: 220px;
+            border-radius: 20px;
+            background: linear-gradient(135deg, rgba(0, 122, 255, 0.3), rgba(0, 81, 213, 0.5));
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 20px;
+            box-shadow:
+                0px 2px 4px rgba(0, 0, 0, 0.1),
+                0px 8px 16px rgba(0, 0, 0, 0.08),
+                0px 20px 40px rgba(0, 122, 255, 0.2);
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow: hidden;
+        }
+
+        .profile-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(180deg, rgba(0, 0, 0, 0.3) 0%, transparent 30%, rgba(0, 0, 0, 0.7) 100%);
+            pointer-events: none;
+        }
+
+        .profile-card:hover {
+            transform: translateY(-4px) scale(1.02);
+            box-shadow:
+                0px 4px 8px rgba(0, 0, 0, 0.15),
+                0px 12px 24px rgba(0, 0, 0, 0.12),
+                0px 24px 48px rgba(0, 122, 255, 0.3);
+        }
+
+        .profile-card:active {
+            transform: scale(0.98);
+        }
+
+        .profile-card-content {
+            position: relative;
+            z-index: 1;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .profile-header {
+            margin-bottom: auto;
+        }
+
+        .car-model {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 4px;
+            text-shadow: 0px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .car-year {
+            font-size: 15px;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .username {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.6);
+            margin-top: 4px;
+        }
+
+        .profile-stats {
+            display: flex;
+            gap: 12px;
+        }
+
+        .stat-box {
+            flex: 1;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .stat-icon {
+            color: #007AFF;
+            font-size: 20px;
+        }
+
+        .stat-info {
+            flex: 1;
+        }
+
+        .stat-label {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.6);
+            text-transform: uppercase;
+            letter-spacing: 0.066px;
+        }
+
+        .stat-value {
+            font-size: 17px;
+            font-weight: 700;
+        }
+
+        /* ============================================================================
+           CONTENT CARDS
+        ============================================================================ */
+        .content-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1), 0px 8px 16px rgba(0, 0, 0, 0.08);
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .content-card:hover {
+            transform: translateY(-2px);
+        }
+
+        .content-card:active {
+            transform: scale(0.98);
+        }
+
+        .card-image {
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(135deg, rgba(0, 122, 255, 0.4), rgba(175, 82, 222, 0.4));
+            position: relative;
+        }
+
+        .card-image::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 80px;
+            background: linear-gradient(180deg, transparent, rgba(0, 0, 0, 0.6));
+        }
+
+        .card-content {
+            padding: 16px;
+        }
+
+        .card-title {
+            font-size: 17px;
+            font-weight: 600;
+            margin-bottom: 4px;
+            letter-spacing: -0.408px;
+        }
+
+        .card-subtitle {
+            font-size: 15px;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 8px;
+            letter-spacing: -0.24px;
+        }
+
+        .card-description {
+            font-size: 16px;
+            color: rgba(255, 255, 255, 0.8);
+            line-height: 1.4;
+            margin-bottom: 12px;
+            letter-spacing: -0.32px;
+        }
+
+        .card-tags {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .tag {
+            padding: 6px 12px;
+            background: rgba(0, 122, 255, 0.2);
+            border: 1px solid rgba(0, 122, 255, 0.3);
+            border-radius: 12px;
+            font-size: 12px;
+            color: #007AFF;
+            font-weight: 500;
+        }
+
+        /* ============================================================================
+           GLASS STAT DISPLAYS
+        ============================================================================ */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .stat-display {
+            padding: 16px;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 16px;
+            box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1), 0px 8px 16px rgba(0, 0, 0, 0.08);
+        }
+
+        .stat-display-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            background: rgba(255, 149, 0, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #FF9500;
+            font-size: 20px;
+            margin-bottom: 12px;
+        }
+
+        .stat-display-icon.green {
+            background: rgba(52, 199, 89, 0.2);
+            color: #34C759;
+        }
+
+        .stat-display-value {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .stat-display-label {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        /* ============================================================================
+           HUDS
+        ============================================================================ */
+        .hud {
+            position: relative;
+            height: 120px;
+            border-radius: 24px 24px 20px 20px;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.15), 0px 4px 8px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .hud:hover {
+            transform: translateY(-2px);
+        }
+
+        .hud-map {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 70px;
+            background: linear-gradient(135deg, rgba(0, 122, 255, 0.3), rgba(52, 199, 89, 0.3));
+        }
+
+        .hud-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 70px;
+            background: linear-gradient(180deg, rgba(0, 0, 0, 0.3) 0%, transparent 30%, rgba(0, 0, 0, 0.5) 100%);
+        }
+
+        .hud-title {
+            position: absolute;
+            top: 16px;
+            left: 16px;
+            right: 16px;
+            font-size: 17px;
+            font-weight: 700;
+            text-shadow: 0px 1px 2px rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .hud-stats {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 16px;
+            display: flex;
+            justify-content: space-around;
+        }
+
+        .hud-stat {
+            text-align: center;
+        }
+
+        .hud-stat-icon {
+            color: #007AFF;
+            font-size: 20px;
+            margin-bottom: 4px;
+        }
+
+        .hud-stat-value {
+            font-size: 17px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #007AFF, #0051D5);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hud-stat-label {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.6);
+            text-transform: uppercase;
+        }
+
+        /* Communication HUD */
+        .comm-hud {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .active-users {
+            padding: 12px 16px;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1), 0px 8px 16px rgba(0, 0, 0, 0.08);
+        }
+
+        .active-indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #34C759;
+            box-shadow: 0 0 8px #34C759, 0 0 16px #34C759;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+
+        .push-to-talk {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: rgba(0, 122, 255, 0.3);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 2px solid #007AFF;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow:
+                0 0 20px rgba(0, 122, 255, 0.5),
+                0px 10px 20px rgba(0, 0, 0, 0.15),
+                0px 4px 8px rgba(0, 0, 0, 0.1);
+            transition: all 0.2s ease;
+        }
+
+        .push-to-talk:active {
+            transform: scale(0.95);
+            background: rgba(255, 59, 48, 0.3);
+            border-color: #FF3B30;
+            box-shadow:
+                0 0 20px rgba(255, 59, 48, 0.5),
+                0px 10px 20px rgba(0, 0, 0, 0.15),
+                0px 4px 8px rgba(0, 0, 0, 0.1);
+            animation: pulseBig 1s ease-in-out infinite;
+        }
+
+        @keyframes pulseBig {
+            0%, 100% { transform: scale(0.95); }
+            50% { transform: scale(1.05); }
+        }
+
+        .push-to-talk svg {
+            width: 36px;
+            height: 36px;
+            fill: white;
+        }
+
+        /* ============================================================================
+           BOTTOM NAVIGATION
+        ============================================================================ */
+        .bottom-nav {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            right: 20px;
+            height: 90px;
+            max-width: 430px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 30px;
+            box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.15), 0px 4px 8px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: space-evenly;
+            padding: 0 10px;
+            z-index: 1000;
+        }
+
+        .nav-item {
+            width: 52px;
+            height: 52px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 2px;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .nav-item:active {
+            transform: scale(0.9);
+        }
+
+        .nav-item.active {
+            background: linear-gradient(135deg, rgba(0, 122, 255, 0.5), rgba(0, 122, 255, 0));
+        }
+
+        .nav-item svg {
+            width: 24px;
+            height: 24px;
+            fill: rgba(255, 255, 255, 0.6);
+            transition: all 0.15s ease;
+        }
+
+        .nav-item.active svg {
+            fill: #007AFF;
+            filter: drop-shadow(0 0 8px rgba(0, 122, 255, 0.5));
+        }
+
+        .nav-label {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.6);
+            letter-spacing: 0.066px;
+            transition: all 0.15s ease;
+        }
+
+        .nav-item.active .nav-label {
+            color: #007AFF;
+            font-weight: 600;
+        }
+
+        /* ============================================================================
+           MODAL
+        ============================================================================ */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+            display: none;
+            align-items: flex-end;
+            z-index: 2000;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal {
+            width: 100%;
+            max-width: 430px;
+            margin: 0 auto;
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 24px 24px 0 0;
+            padding: 20px;
+            box-shadow: 0px -10px 40px rgba(0, 0, 0, 0.3);
+            animation: slideUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(100%); }
+            to { transform: translateY(0); }
+        }
+
+        .modal-handle {
+            width: 40px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 2px;
+            margin: 0 auto 20px;
+        }
+
+        .modal-title {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+
+        .modal-text {
+            font-size: 17px;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 24px;
+            line-height: 1.5;
+        }
+
+        /* ============================================================================
+           UTILITIES
+        ============================================================================ */
+        .icon-row {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-start;
+        }
+
+        .mb-16 {
+            margin-bottom: 16px;
+        }
+
+        .mb-32 {
+            margin-bottom: 32px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🍎 Apple 3D UI</h1>
+        <p>Flutter Component Test Demo</p>
+    </div>
+
+    <div class="container">
+        <!-- SEARCH BAR -->
+        <div class="section">
+            <div class="section-title">Search Bar</div>
+            <div class="search-bar" id="searchBar">
+                <span class="search-icon">🔍</span>
+                <input type="text" placeholder="Search posts, cars, events..." id="searchInput">
+                <div class="clear-btn" onclick="clearSearch()">✕</div>
+            </div>
+        </div>
+
+        <!-- BUTTONS -->
+        <div class="section">
+            <div class="section-title">Buttons</div>
+            <div class="button-group">
+                <button class="btn btn-primary" onclick="showModal()">
+                    <span>Primary Button</span>
+                    <span>→</span>
+                </button>
+                <button class="btn btn-secondary">
+                    <span>Secondary Button</span>
+                    <span>⚙️</span>
+                </button>
+            </div>
+
+            <div class="icon-row mb-16" style="margin-top: 12px;">
+                <button class="btn-icon">❤️</button>
+                <button class="btn-icon">💬</button>
+                <button class="btn-icon">🔔</button>
+                <button class="btn-icon">⚙️</button>
+            </div>
+
+            <div class="btn-pills">
+                <button class="btn-pill active">All</button>
+                <button class="btn-pill">🏁 Racing</button>
+                <button class="btn-pill">🛍️ Products</button>
+                <button class="btn-pill">📅 Events</button>
+            </div>
+        </div>
+
+        <!-- STATS -->
+        <div class="section">
+            <div class="section-title">Glass Stat Displays</div>
+            <div class="stats-grid">
+                <div class="stat-display">
+                    <div class="stat-display-icon">📅</div>
+                    <div class="stat-display-value">12</div>
+                    <div class="stat-display-label">Events</div>
+                </div>
+                <div class="stat-display">
+                    <div class="stat-display-icon green">🗺️</div>
+                    <div class="stat-display-value">8</div>
+                    <div class="stat-display-label">Routes</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PROFILE CARD -->
+        <div class="section">
+            <div class="section-title">Profile Card (Wallet Style)</div>
+            <div class="profile-card">
+                <div class="profile-card-content">
+                    <div class="profile-header">
+                        <div class="car-model">2023 Nissan GTR</div>
+                        <div class="car-year">2023</div>
+                        <div class="username">@drift_king</div>
+                    </div>
+                    <div class="profile-stats">
+                        <div class="stat-box">
+                            <div class="stat-icon">⚡</div>
+                            <div class="stat-info">
+                                <div class="stat-label">HP</div>
+                                <div class="stat-value">650</div>
+                            </div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-icon">📈</div>
+                            <div class="stat-info">
+                                <div class="stat-label">TOP</div>
+                                <div class="stat-value">195 mph</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CONTENT CARDS -->
+        <div class="section">
+            <div class="section-title">Content Cards</div>
+            <div class="content-card" onclick="showModal()">
+                <div class="card-image"></div>
+                <div class="card-content">
+                    <div class="card-title">Modified GTR R35 Build</div>
+                    <div class="card-subtitle">@user1 · 2h ago</div>
+                    <div class="card-description">
+                        Just finished installing the new turbo kit. Can't wait to test it out!
+                    </div>
+                    <div class="card-tags">
+                        <span class="tag">GTR</span>
+                        <span class="tag">Turbo</span>
+                        <span class="tag">Build</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="content-card">
+                <div class="card-image" style="background: linear-gradient(135deg, rgba(52, 199, 89, 0.4), rgba(255, 204, 0, 0.4));"></div>
+                <div class="card-content">
+                    <div class="card-title">Track Day Results</div>
+                    <div class="card-subtitle">@speedster · 5h ago</div>
+                    <div class="card-description">
+                        Best lap time yet! The new suspension setup is perfect.
+                    </div>
+                    <div class="card-tags">
+                        <span class="tag">Track</span>
+                        <span class="tag">Racing</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- HUDS -->
+        <div class="section">
+            <div class="section-title">Routes HUD</div>
+            <div class="hud">
+                <div class="hud-map"></div>
+                <div class="hud-overlay"></div>
+                <div class="hud-title">
+                    <span>Mountain Pass Route</span>
+                    <span>↕️</span>
+                </div>
+                <div class="hud-stats">
+                    <div class="hud-stat">
+                        <div class="hud-stat-icon">📏</div>
+                        <div class="hud-stat-value">45.2 mi</div>
+                        <div class="hud-stat-label">Distance</div>
+                    </div>
+                    <div class="hud-stat">
+                        <div class="hud-stat-icon">⏱️</div>
+                        <div class="hud-stat-value">1h 20m</div>
+                        <div class="hud-stat-label">Time</div>
+                    </div>
+                    <div class="hud-stat">
+                        <div class="hud-stat-icon">📍</div>
+                        <div class="hud-stat-value">3:45 PM</div>
+                        <div class="hud-stat-label">ETA</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- COMMUNICATION HUD -->
+        <div class="section mb-32">
+            <div class="section-title">Communication HUD</div>
+            <div class="comm-hud">
+                <div class="active-users">
+                    <div class="active-indicator"></div>
+                    <span style="font-size: 16px; font-weight: 600;">3 active</span>
+                </div>
+                <div class="push-to-talk" id="pttButton">
+                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/>
+                        <path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/>
+                    </svg>
+                </div>
+                <p style="font-size: 13px; color: rgba(255,255,255,0.6); text-align: center;">
+                    Press and hold to talk
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- BOTTOM NAVIGATION -->
+    <nav class="bottom-nav">
+        <div class="nav-item" onclick="setActiveNav(this)">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path d="M20.5 3l-.16.03L15 5.1 9 3 3.36 4.9c-.21.07-.36.25-.36.48V20.5c0 .28.22.5.5.5l.16-.03L9 18.9l6 2.1 5.64-1.9c.21-.07.36-.25.36-.48V3.5c0-.28-.22-.5-.5-.5zM15 19l-6-2.11V5l6 2.11V19z"/>
+            </svg>
+            <span class="nav-label">Routes</span>
+        </div>
+        <div class="nav-item active" onclick="setActiveNav(this)">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
+            </svg>
+            <span class="nav-label">Home</span>
+        </div>
+        <div class="nav-item" onclick="setActiveNav(this)">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+  	        <path d="M10 4h4v6h6v4h-6v6h-4v-6H4v-4h6V4z"/>
+	    </svg>
+            <span class="nav-label">Posts</span>
+        </div>
+        <div class="nav-item" onclick="setActiveNav(this)">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM8 14H6v-2h2v2zm0-3H6V9h2v2zm0-3H6V6h2v2zm7 6h-5v-2h5v2zm3-3h-8V9h8v2zm0-3h-8V6h8v2z"/>
+            </svg>
+            <span class="nav-label">News</span>
+        </div>
+        <div class="nav-item" onclick="setActiveNav(this)">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/>
+            </svg>
+            <span class="nav-label">Chat</span>
+        </div>
+    </nav>
+
+    <!-- MODAL -->
+    <div class="modal-overlay" id="modalOverlay" onclick="hideModal()">
+        <div class="modal" onclick="event.stopPropagation()">
+            <div class="modal-handle"></div>
+            <div class="modal-title">Post Details</div>
+            <div class="modal-text">
+                This is a detailed view of the post. In a real app, this would show the full post content, images, comments, and interactions.
+            </div>
+            <button class="btn btn-primary" style="width: 100%;" onclick="hideModal()">
+                <span>❤️</span>
+                <span>Like</span>
+            </button>
+            <button class="btn btn-secondary" style="width: 100%; margin-top: 12px;" onclick="hideModal()">
+                <span>Share</span>
+                <span>🔗</span>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Search bar functionality
+        const searchInput = document.getElementById('searchInput');
+        const searchBar = document.getElementById('searchBar');
+
+        searchInput.addEventListener('input', function() {
+            if (this.value.length > 0) {
+                searchBar.classList.add('has-text');
+            } else {
+                searchBar.classList.remove('has-text');
+            }
+        });
+
+        function clearSearch() {
+            searchInput.value = '';
+            searchBar.classList.remove('has-text');
+        }
+
+        // Bottom nav
+        function setActiveNav(element) {
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            element.classList.add('active');
+        }
+
+        // Pill buttons
+        document.querySelectorAll('.btn-pill').forEach(pill => {
+            pill.addEventListener('click', function() {
+                document.querySelectorAll('.btn-pill').forEach(p => p.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+
+        // Modal
+        function showModal() {
+            document.getElementById('modalOverlay').classList.add('active');
+        }
+
+        function hideModal() {
+            document.getElementById('modalOverlay').classList.remove('active');
+        }
+
+        // Push to talk
+        const pttButton = document.getElementById('pttButton');
+        let isRecording = false;
+
+        pttButton.addEventListener('mousedown', function() {
+            isRecording = true;
+        });
+
+        pttButton.addEventListener('mouseup', function() {
+            isRecording = false;
+        });
+
+        pttButton.addEventListener('mouseleave', function() {
+            isRecording = false;
+        });
+
+        // Touch events for mobile
+        pttButton.addEventListener('touchstart', function(e) {
+            e.preventDefault();
+            isRecording = true;
+        });
+
+        pttButton.addEventListener('touchend', function(e) {
+            e.preventDefault();
+            isRecording = false;
+        });
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                hideModal();
+            }
+        });
+    </script>
+</body>
+</html>
