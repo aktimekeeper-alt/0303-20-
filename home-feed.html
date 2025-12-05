@@ -11,34 +11,40 @@
         <div class="status-bar">
             <span>9:41</span>
             <div class="status-icons">
-                <span>📶</span>
-                <span>📡</span>
-                <span>🔋</span>
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="white"><path d="M1 9l2 2c4.97-4.97 13.03-4.97 18 0l2-2C16.93 2.93 7.08 2.93 1 9zm8 8l3 3 3-3c-1.65-1.66-4.34-1.66-6 0zm-4-4l2 2c2.76-2.76 7.24-2.76 10 0l2-2C15.14 9.14 8.87 9.14 5 13z"/></svg>
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="white"><path d="M2 22h20V2z M12 12V2L2 22h10zm2 0h8L12 2v10z"/></svg>
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="white"><path d="M15.67 4H14V2h-4v2H8.33C7.6 4 7 4.6 7 5.33v15.33C7 21.4 7.6 22 8.33 22h7.33c.74 0 1.34-.6 1.34-1.33V5.33C17 4.6 16.4 4 15.67 4z"/></svg>
             </div>
         </div>
 
         <div class="app-header">
             <h1>Burnout</h1>
-            <button class="btn-icon" onclick="showToast('Notifications')">🔔</button>
+            <button class="btn-icon" onclick="showToast('Notifications')">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="white"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg>
+            </button>
         </div>
 
         <div class="content">
             <!-- Search Bar -->
             <div class="search-bar" id="searchBar">
-                <span class="search-icon">🔍</span>
+                <svg class="search-icon" viewBox="0 0 24 24" width="18" height="18" fill="rgba(255,255,255,0.6)"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
                 <input type="text" placeholder="Search posts, cars, events..." id="searchInput">
-                <div class="clear-btn" onclick="clearSearch()">✕</div>
+                <div class="clear-btn" onclick="clearSearch()">x</div>
             </div>
 
             <!-- Stats -->
             <div class="stats-grid">
                 <div class="stat-display">
-                    <div class="stat-display-icon">📅</div>
+                    <div class="stat-display-icon">
+                        <svg viewBox="0 0 24 24" width="22" height="22" fill="#FF9500"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zM9 14H7v-2h2v2zm4 0h-2v-2h2v2zm4 0h-2v-2h2v2zm-8 4H7v-2h2v2zm4 0h-2v-2h2v2zm4 0h-2v-2h2v2z"/></svg>
+                    </div>
                     <div class="stat-display-value">24</div>
                     <div class="stat-display-label">Upcoming Events</div>
                 </div>
                 <div class="stat-display">
-                    <div class="stat-display-icon green">🗺️</div>
+                    <div class="stat-display-icon green">
+                        <svg viewBox="0 0 24 24" width="22" height="22" fill="#34C759"><path d="M20.5 3l-.16.03L15 5.1 9 3 3.36 4.9c-.21.07-.36.25-.36.48V20.5c0 .28.22.5.5.5l.16-.03L9 18.9l6 2.1 5.64-1.9c.21-.07.36-.25.36-.48V3.5c0-.28-.22-.5-.5-.5zM15 19l-6-2.11V5l6 2.11V19z"/></svg>
+                    </div>
                     <div class="stat-display-value">15</div>
                     <div class="stat-display-label">Active Routes</div>
                 </div>
@@ -48,9 +54,9 @@
             <div class="section-title" style="margin-top: 24px;">Feed</div>
             <div class="btn-pills">
                 <button class="btn-pill active" data-category="all">All</button>
-                <button class="btn-pill" data-category="builds">🔧 Builds</button>
-                <button class="btn-pill" data-category="meets">🏁 Meets</button>
-                <button class="btn-pill" data-category="racing">⚡ Racing</button>
+                <button class="btn-pill" data-category="builds">Builds</button>
+                <button class="btn-pill" data-category="meets">Meets</button>
+                <button class="btn-pill" data-category="racing">Racing</button>
             </div>
 
             <!-- Posts Feed -->
@@ -68,14 +74,13 @@
                 <span class="nav-label">Chat</span>
             </div>
             <div class="nav-item" onclick="window.location.href='post.html'">
-		<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640"><!--!Font Awesome Free v7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2025 Fonticons, Inc.--><path d="M352 128C352 110.3 337.7 96 320 96C302.3 96 288 110.3 288 128L288 288L128 		288C110.3 288 96 302.3 96 320C96 337.7 110.3 352 128 352L288 352L288 512C288 529.7 302.3 544 320 544C337.7 544 352 529.7 352 512L352 352L512 352C529.7 352 544 337.7 544 320C544 302.3 529.7 288 512 288L352 288L352 128z"/></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640"><path d="M352 128C352 110.3 337.7 96 320 96C302.3 96 288 110.3 288 128L288 288L128 288C110.3 288 96 302.3 96 320C96 337.7 110.3 352 128 352L288 352L288 512C288 529.7 302.3 544 320 544C337.7 544 352 529.7 352 512L352 352L512 352C529.7 352 544 337.7 544 320C544 302.3 529.7 288 512 288L352 288L352 128z"/></svg>
                 <span class="nav-label">Post</span>
             </div>
             <div class="nav-item" onclick="window.location.href='routes.html'">
                 <svg viewBox="0 0 24 24"><path d="M20.5 3l-.16.03L15 5.1 9 3 3.36 4.9c-.21.07-.36.25-.36.48V20.5c0 .28.22.5.5.5l.16-.03L9 18.9l6 2.1 5.64-1.9c.21-.07.36-.25.36-.48V3.5c0-.28-.22-.5-.5-.5zM15 19l-6-2.11V5l6 2.11V19z"/></svg>
                 <span class="nav-label">Routes</span>
             </div>
-
             <div class="nav-item" onclick="window.location.href='profile.html'">
                 <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
                 <span class="nav-label">Profile</span>
@@ -92,19 +97,19 @@
         function renderPosts(filter = 'all') {
             const filtered = filter === 'all' ? posts : posts.filter(p => p.category === filter);
             feedEl.innerHTML = filtered.map(post => `
-                <div class="content-card" onclick="showToast('Liked: ${post.title}')">
+                <div class="content-card" onclick="showToast('Liked: ${post.title.replace(/[^\w\s]/g, '')}')">
                     <div class="card-image" style="background: ${post.gradient}"></div>
                     <div class="card-content">
-                        <div class="card-title">${post.title}</div>
+                        <div class="card-title">${post.title.replace(/[^\w\s!-]/g, '')}</div>
                         <div class="card-subtitle">${post.author} · ${post.time}</div>
-                        <div class="card-description">${post.description}</div>
+                        <div class="card-description">${post.description.replace(/[^\w\s.,!?'-]/g, '')}</div>
                         <div class="card-tags">
                             ${post.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
                         </div>
                         <div class="card-stats">
-                            <span>❤️ ${post.likes}</span>
-                            <span>💬 ${post.comments}</span>
-                            <span>🔄 ${post.shares}</span>
+                            <span><svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" style="vertical-align: middle; margin-right: 4px;"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>${post.likes}</span>
+                            <span><svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" style="vertical-align: middle; margin-right: 4px;"><path d="M21.99 4c0-1.1-.89-2-1.99-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h14l4 4-.01-18z"/></svg>${post.comments}</span>
+                            <span><svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" style="vertical-align: middle; margin-right: 4px;"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z"/></svg>${post.shares}</span>
                         </div>
                     </div>
                 </div>

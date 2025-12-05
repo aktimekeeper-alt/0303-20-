@@ -11,15 +11,17 @@
         <div class="status-bar">
             <span>9:41</span>
             <div class="status-icons">
-                <span>📶</span>
-                <span>📡</span>
-                <span>🔋</span>
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="white"><path d="M1 9l2 2c4.97-4.97 13.03-4.97 18 0l2-2C16.93 2.93 7.08 2.93 1 9zm8 8l3 3 3-3c-1.65-1.66-4.34-1.66-6 0zm-4-4l2 2c2.76-2.76 7.24-2.76 10 0l2-2C15.14 9.14 8.87 9.14 5 13z"/></svg>
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="white"><path d="M2 22h20V2z M12 12V2L2 22h10zm2 0h8L12 2v10z"/></svg>
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="white"><path d="M15.67 4H14V2h-4v2H8.33C7.6 4 7 4.6 7 5.33v15.33C7 21.4 7.6 22 8.33 22h7.33c.74 0 1.34-.6 1.34-1.33V5.33C17 4.6 16.4 4 15.67 4z"/></svg>
             </div>
         </div>
 
         <div class="app-header">
             <h1>Events</h1>
-            <button class="btn-icon" onclick="showToast('Calendar View')">📅</button>
+            <button class="btn-icon" onclick="showToast('Calendar View')">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="white"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zM9 14H7v-2h2v2zm4 0h-2v-2h2v2zm4 0h-2v-2h2v2zm-8 4H7v-2h2v2zm4 0h-2v-2h2v2zm4 0h-2v-2h2v2z"/></svg>
+            </button>
         </div>
 
         <div class="content">
@@ -28,40 +30,39 @@
             <!-- Filter Pills -->
             <div class="btn-pills">
                 <button class="btn-pill active" data-type="all">All</button>
-                <button class="btn-pill" data-type= "Drive"  >🚗 Drive</button>
-                <button class="btn-pill" data-type= "Track" >🏁 Track</button>
-                <button class="btn-pill" data-type= "Show" >☕ Show</button>
+                <button class="btn-pill" data-type="Drive">Drive</button>
+                <button class="btn-pill" data-type="Track">Track</button>
+                <button class="btn-pill" data-type="Show">Show</button>
             </div>
 
             <!-- Events List -->
             <div id="eventsList"></div>
         </div>
 
-<!-- Bottom Nav -->
+        <!-- Bottom Nav -->
         <nav class="bottom-nav">
             <div class="nav-item" onclick="window.location.href='home-feed.html'">
-                <svg viewBox="0 0 30 30">Home<path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+                <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+                <span class="nav-label">Home</span>
             </div>
             <div class="nav-item" onclick="window.location.href='chat.html'">
                 <svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg>
                 <span class="nav-label">Chat</span>
             </div>
             <div class="nav-item" onclick="window.location.href='post.html'">
-		<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640"><!--!Font Awesome Free v7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2025 Fonticons, Inc.--><path d="M352 128C352 110.3 337.7 96 320 96C302.3 96 288 110.3 288 128L288 288L128 		288C110.3 288 96 302.3 96 320C96 337.7 110.3 352 128 352L288 352L288 512C288 529.7 302.3 544 320 544C337.7 544 352 529.7 352 512L352 352L512 352C529.7 352 544 337.7 544 320C544 302.3 529.7 288 512 288L352 288L352 128z"/></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640"><path d="M352 128C352 110.3 337.7 96 320 96C302.3 96 288 110.3 288 128L288 288L128 288C110.3 288 96 302.3 96 320C96 337.7 110.3 352 128 352L288 352L288 512C288 529.7 302.3 544 320 544C337.7 544 352 529.7 352 512L352 352L512 352C529.7 352 544 337.7 544 320C544 302.3 529.7 288 512 288L352 288L352 128z"/></svg>
                 <span class="nav-label">Post</span>
             </div>
             <div class="nav-item" onclick="window.location.href='routes.html'">
                 <svg viewBox="0 0 24 24"><path d="M20.5 3l-.16.03L15 5.1 9 3 3.36 4.9c-.21.07-.36.25-.36.48V20.5c0 .28.22.5.5.5l.16-.03L9 18.9l6 2.1 5.64-1.9c.21-.07.36-.25.36-.48V3.5c0-.28-.22-.5-.5-.5zM15 19l-6-2.11V5l6 2.11V19z"/></svg>
                 <span class="nav-label">Routes</span>
             </div>
-
             <div class="nav-item" onclick="window.location.href='profile.html'">
                 <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
                 <span class="nav-label">Profile</span>
             </div>
         </nav>
     </div>
-
 
     <script src="data.js"></script>
     <script src="app.js"></script>
@@ -79,16 +80,16 @@
                     <div style="margin: 16px 0; padding: 12px; background: rgba(0,122,255,0.1); border-radius: 12px; border: 1px solid rgba(0,122,255,0.3);">
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; font-size: 14px;">
                             <div>
-                                <div style="color: rgba(255,255,255,0.6); font-size: 16px; margin-bottom: 4px;">📍 Location</div>
+                                <div style="color: rgba(255,255,255,0.6); font-size: 12px; margin-bottom: 4px; text-transform: uppercase;">Location</div>
                                 <div style="color: white; font-weight: 600;">${event.location}</div>
                             </div>
                             <div>
-                                <div style="color: rgba(255,255,255,0.6); font-size: 16px; margin-bottom: 4px;">⏰ Time</div>
+                                <div style="color: rgba(255,255,255,0.6); font-size: 12px; margin-bottom: 4px; text-transform: uppercase;">Time</div>
                                 <div style="color: white; font-weight: 600;">${event.time}</div>
                             </div>
                         </div>
                         <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.1);">
-                            <div style="color: rgba(255,255,255,0.6); font-size: 16px; margin-bottom: 4px;">📅 Date</div>
+                            <div style="color: rgba(255,255,255,0.6); font-size: 12px; margin-bottom: 4px; text-transform: uppercase;">Date</div>
                             <div style="color: white; font-weight: 600;">${formatDate(event.date)}</div>
                         </div>
                     </div>
@@ -96,7 +97,7 @@
                     <div class="card-tags">
                         <span class="tag">${event.type}</span>
                         <span class="tag">${event.difficulty}</span>
-                        <span class="tag">👥 ${event.attendees}${event.maxAttendees ? '/' + event.maxAttendees : '+'}</span>
+                        <span class="tag">${event.attendees}${event.maxAttendees ? '/' + event.maxAttendees : '+'} attending</span>
                     </div>
 
                     <div style="margin-top: 16px; text-align: center;">
