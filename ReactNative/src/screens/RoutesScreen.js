@@ -95,7 +95,7 @@ export default function RoutesScreen({ navigation }) {
 
         <View style={styles.listContainer}>
           {routes.map((route) => (
-            <RouteCard key={route.id} route={route} onPress={() => {}} />
+            <RouteCard key={route.id} route={route} onPress={() => navigation.navigate('RouteDetail', { route })} />
           ))}
         </View>
       </ScrollView>

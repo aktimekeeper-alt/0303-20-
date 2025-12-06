@@ -88,7 +88,7 @@ export default function ChatScreen({ navigation }) {
             <ConversationItem
               key={conv.id}
               conversation={conv}
-              onPress={() => {}}
+              onPress={() => navigation.navigate('ChatDetail', { conversation: conv })}
             />
           ))}
         </View>

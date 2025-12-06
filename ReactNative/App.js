@@ -12,6 +12,13 @@ import PostScreen from './src/screens/PostScreen';
 import RoutesScreen from './src/screens/RoutesScreen';
 import ProfileScreen from './src/screens/ProfileScreen';
 import EventsScreen from './src/screens/EventsScreen';
+import SettingsScreen from './src/screens/SettingsScreen';
+import NotificationsScreen from './src/screens/NotificationsScreen';
+import PostDetailScreen from './src/screens/PostDetailScreen';
+import ChatDetailScreen from './src/screens/ChatDetailScreen';
+import RouteDetailScreen from './src/screens/RouteDetailScreen';
+import EventDetailScreen from './src/screens/EventDetailScreen';
+import ModDetailScreen from './src/screens/ModDetailScreen';
 
 import { colors } from './src/styles/theme';
 
@@ -113,9 +120,21 @@ export default function App() {
     <View style={styles.container}>
       <StatusBar style="light" />
       <NavigationContainer>
-        <Stack.Navigator screenOptions={{ headerShown: false }}>
+        <Stack.Navigator
+          screenOptions={{
+            headerShown: false,
+            cardStyle: { backgroundColor: colors.background },
+          }}
+        >
           <Stack.Screen name="MainTabs" component={MainTabs} />
           <Stack.Screen name="Events" component={EventsScreen} />
+          <Stack.Screen name="Settings" component={SettingsScreen} />
+          <Stack.Screen name="Notifications" component={NotificationsScreen} />
+          <Stack.Screen name="PostDetail" component={PostDetailScreen} />
+          <Stack.Screen name="ChatDetail" component={ChatDetailScreen} />
+          <Stack.Screen name="RouteDetail" component={RouteDetailScreen} />
+          <Stack.Screen name="EventDetail" component={EventDetailScreen} />
+          <Stack.Screen name="ModDetail" component={ModDetailScreen} />
         </Stack.Navigator>
       </NavigationContainer>
     </View>

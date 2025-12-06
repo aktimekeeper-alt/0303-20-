@@ -82,7 +82,7 @@ export default function ProfileScreen({ navigation }) {
       <Header
         title="Profile"
         rightIcon={<SettingsIcon />}
-        onRightPress={() => {}}
+        onRightPress={() => navigation.navigate('Settings')}
       />
 
       <ScrollView style={styles.scroll} showsVerticalScrollIndicator={false}>
@@ -152,7 +152,7 @@ export default function ProfileScreen({ navigation }) {
         <Text style={styles.sectionTitle}>Modifications</Text>
         <View style={styles.modsContainer}>
           {profile.mods.map((mod, index) => (
-            <TouchableOpacity key={index} style={styles.modItem} activeOpacity={0.7}>
+            <TouchableOpacity key={index} style={styles.modItem} activeOpacity={0.7} onPress={() => navigation.navigate('ModDetail', { mod: { name: mod, category: 'Performance', brand: 'Various', installedDate: 'Recently', notes: `Modification: ${mod}` } })}>
               <ToolIcon />
               <View style={styles.modContent}>
                 <Text style={styles.modTitle} numberOfLines={1}>{mod}</Text>
