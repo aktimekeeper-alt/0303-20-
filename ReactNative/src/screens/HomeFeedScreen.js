@@ -48,7 +48,7 @@ export default function HomeFeedScreen({ navigation }) {
       <Header
         title="Burnout"
         rightIcon={<BellIcon />}
-        onRightPress={() => {}}
+        onRightPress={() => navigation.navigate('Notifications')}
       />
 
       <ScrollView style={styles.scroll} showsVerticalScrollIndicator={false}>
@@ -85,7 +85,7 @@ export default function HomeFeedScreen({ navigation }) {
 
         <View style={styles.feedContainer}>
           {filteredPosts.map((post) => (
-            <ContentCard key={post.id} post={post} onPress={() => {}} />
+            <ContentCard key={post.id} post={post} onPress={() => navigation.navigate('PostDetail', { post })} />
           ))}
         </View>
       </ScrollView>

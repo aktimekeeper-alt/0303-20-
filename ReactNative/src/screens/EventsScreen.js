@@ -115,7 +115,7 @@ export default function EventsScreen({ navigation }) {
 
         <View style={styles.listContainer}>
           {filteredEvents.map((event) => (
-            <EventCard key={event.id} event={event} onPress={() => {}} />
+            <EventCard key={event.id} event={event} onPress={() => navigation.navigate('EventDetail', { event })} />
           ))}
         </View>
       </ScrollView>
