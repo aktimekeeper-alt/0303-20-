@@ -5,7 +5,8 @@ import { LinearGradient } from 'expo-linear-gradient';
 import Svg, { Path, Rect } from 'react-native-svg';
 import Header from '../components/Header';
 import { profiles, formatNumber } from '../data/appData';
-import { colors, spacing, borderRadius, shadows } from '../styles/theme';
+import { useTheme } from '../context/ThemeContext';
+import { spacing, borderRadius, shadows } from '../styles/theme';
 
 const SettingsIcon = () => (
   <Svg viewBox="0 0 24 24" width={20} height={20} fill="white">
@@ -13,8 +14,8 @@ const SettingsIcon = () => (
   </Svg>
 );
 
-const ToolIcon = () => (
-  <Svg viewBox="0 0 24 24" width={24} height={24} fill="rgba(0, 122, 255, 0.8)">
+const ToolIcon = ({ color }) => (
+  <Svg viewBox="0 0 24 24" width={24} height={24} fill={color || "rgba(0, 122, 255, 0.8)"}>
     <Path d="M22.7 19l-9.1-9.1c.9-2.3.4-5-1.5-6.9-2-2-5-2.4-7.4-1.3L9 6 6 9 1.6 4.7C.4 7.1.9 10.1 2.9 12.1c1.9 1.9 4.6 2.4 6.9 1.5l9.1 9.1c.4.4 1 .4 1.4 0l2.3-2.3c.5-.4.5-1.1.1-1.4z" />
   </Svg>
 );
@@ -43,42 +44,40 @@ const QRCode = () => (
   </Svg>
 );
 
-const statIcons = {
-  posts: (
-    <Svg viewBox="0 0 24 24" width={20} height={20} fill={colors.primary}>
-      <Path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z" />
+const StatIcon = ({ type, colors }) => {
+  const iconPaths = {
+    posts: "M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z",
+    followers: "M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z",
+    meets: "M14.4 6L14 4H5v17h2v-7h5.6l.4 2h7V6z",
+    trackDays: "M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z",
+  };
+  const iconColors = {
+    posts: colors.primary,
+    followers: colors.secondary,
+    meets: colors.danger,
+    trackDays: colors.purple,
+  };
+  return (
+    <Svg viewBox="0 0 24 24" width={20} height={20} fill={iconColors[type]}>
+      <Path d={iconPaths[type]} />
     </Svg>
-  ),
-  followers: (
-    <Svg viewBox="0 0 24 24" width={20} height={20} fill={colors.success}>
-      <Path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z" />
-    </Svg>
-  ),
-  meets: (
-    <Svg viewBox="0 0 24 24" width={20} height={20} fill={colors.danger}>
-      <Path d="M14.4 6L14 4H5v17h2v-7h5.6l.4 2h7V6z" />
-    </Svg>
-  ),
-  trackDays: (
-    <Svg viewBox="0 0 24 24" width={20} height={20} fill={colors.purple}>
-      <Path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z" />
-    </Svg>
-  ),
+  );
 };
 
 export default function ProfileScreen({ navigation }) {
+  const { colors } = useTheme();
   const [isFlipped, setIsFlipped] = useState(false);
   const profile = profiles[0];
 
   const stats = [
-    { key: 'posts', value: profile.stats.posts, label: 'Posts', color: 'rgba(0, 122, 255, 0.2)', link: 'Home' },
-    { key: 'followers', value: formatNumber(profile.stats.followers), label: 'Followers', color: 'rgba(52, 199, 89, 0.2)', link: 'Chat' },
+    { key: 'posts', value: profile.stats.posts, label: 'Posts', color: `${colors.primary}33`, link: 'Home' },
+    { key: 'followers', value: formatNumber(profile.stats.followers), label: 'Followers', color: `${colors.secondary}33`, link: 'Chat' },
     { key: 'meets', value: profile.stats.meetsAttended, label: 'Meets', color: 'rgba(255, 59, 48, 0.2)', link: 'Events' },
     { key: 'trackDays', value: profile.stats.trackDays || 0, label: 'Track Days', color: 'rgba(175, 82, 222, 0.2)', link: 'Routes' },
   ];
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top']}>
       <Header
         title="Profile"
         rightIcon={<SettingsIcon />}
@@ -86,7 +85,7 @@ export default function ProfileScreen({ navigation }) {
       />
 
       <ScrollView style={styles.scroll} showsVerticalScrollIndicator={false}>
-        <Text style={styles.sectionTitle}>My Garage</Text>
+        <Text style={[styles.sectionTitle, { color: colors.textSecondary }]}>My Garage</Text>
 
         {/* Flip Card */}
         <TouchableOpacity
@@ -96,24 +95,24 @@ export default function ProfileScreen({ navigation }) {
         >
           {!isFlipped ? (
             <LinearGradient
-              colors={[colors.primary, colors.primaryDark]}
+              colors={[colors.primary, '#0055CC']}
               style={styles.cardFront}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 1 }}
             >
               <View>
-                <Text style={styles.carModel}>{profile.carModel}</Text>
+                <Text style={[styles.carModel, { color: colors.text }]}>{profile.carModel}</Text>
                 <Text style={styles.carYear}>{profile.year}</Text>
                 <Text style={styles.username}>{profile.username}</Text>
               </View>
               <View style={styles.carStatsRow}>
                 <View style={styles.carStatBox}>
                   <Text style={styles.carStatLabel}>HP</Text>
-                  <Text style={styles.carStatValue}>{profile.horsePower}</Text>
+                  <Text style={[styles.carStatValue, { color: colors.text }]}>{profile.horsePower}</Text>
                 </View>
                 <View style={styles.carStatBox}>
                   <Text style={styles.carStatLabel}>Top Speed</Text>
-                  <Text style={styles.carStatValue}>{profile.topSpeed}</Text>
+                  <Text style={[styles.carStatValue, { color: colors.text }]}>{profile.topSpeed}</Text>
                 </View>
               </View>
             </LinearGradient>
@@ -127,38 +126,38 @@ export default function ProfileScreen({ navigation }) {
             </View>
           )}
         </TouchableOpacity>
-        <Text style={styles.flipHint}>Tap card to flip</Text>
+        <Text style={[styles.flipHint, { color: colors.textTertiary }]}>Tap card to flip</Text>
 
         {/* Stats Grid */}
-        <Text style={[styles.sectionTitle, { marginTop: spacing.lg }]}>Statistics</Text>
+        <Text style={[styles.sectionTitle, { marginTop: spacing.lg, color: colors.textSecondary }]}>Statistics</Text>
         <View style={styles.statsGrid}>
           {stats.map((stat) => (
             <TouchableOpacity
               key={stat.key}
-              style={styles.statBox}
+              style={[styles.statBox, { backgroundColor: colors.card, borderColor: colors.cardBorder }]}
               onPress={() => navigation.navigate(stat.link)}
               activeOpacity={0.7}
             >
               <View style={[styles.statIcon, { backgroundColor: stat.color }]}>
-                {statIcons[stat.key]}
+                <StatIcon type={stat.key} colors={colors} />
               </View>
-              <Text style={styles.statValue}>{stat.value}</Text>
-              <Text style={styles.statLabel}>{stat.label}</Text>
+              <Text style={[styles.statValue, { color: colors.text }]}>{stat.value}</Text>
+              <Text style={[styles.statLabel, { color: colors.textSecondary }]}>{stat.label}</Text>
             </TouchableOpacity>
           ))}
         </View>
 
         {/* Modifications */}
-        <Text style={styles.sectionTitle}>Modifications</Text>
+        <Text style={[styles.sectionTitle, { color: colors.textSecondary }]}>Modifications</Text>
         <View style={styles.modsContainer}>
           {profile.mods.map((mod, index) => (
-            <TouchableOpacity key={index} style={styles.modItem} activeOpacity={0.7} onPress={() => navigation.navigate('ModDetail', { mod: { name: mod, category: 'Performance', brand: 'Various', installedDate: 'Recently', notes: `Modification: ${mod}` } })}>
-              <ToolIcon />
+            <TouchableOpacity key={index} style={[styles.modItem, { backgroundColor: colors.card, borderColor: colors.cardBorder }]} activeOpacity={0.7} onPress={() => navigation.navigate('ModDetail', { mod: { name: mod, category: 'Performance', brand: 'Various', installedDate: 'Recently', notes: `Modification: ${mod}` } })}>
+              <ToolIcon color={colors.primary} />
               <View style={styles.modContent}>
-                <Text style={styles.modTitle} numberOfLines={1}>{mod}</Text>
-                <Text style={styles.modSubtitle}>Mod {index + 1} of {profile.mods.length}</Text>
+                <Text style={[styles.modTitle, { color: colors.text }]} numberOfLines={1}>{mod}</Text>
+                <Text style={[styles.modSubtitle, { color: colors.textSecondary }]}>Mod {index + 1} of {profile.mods.length}</Text>
               </View>
-              <Text style={styles.modArrow}>›</Text>
+              <Text style={[styles.modArrow, { color: colors.textTertiary }]}>›</Text>
             </TouchableOpacity>
           ))}
         </View>
@@ -170,7 +169,6 @@ export default function ProfileScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
   },
   scroll: {
     flex: 1,
@@ -179,7 +177,6 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 13,
     fontWeight: '600',
-    color: colors.textSecondary,
     textTransform: 'uppercase',
     letterSpacing: 1,
     marginBottom: spacing.sm,
@@ -205,7 +202,6 @@ const styles = StyleSheet.create({
   carModel: {
     fontSize: 26,
     fontWeight: '700',
-    color: colors.text,
   },
   carYear: {
     fontSize: 15,
@@ -238,7 +234,6 @@ const styles = StyleSheet.create({
   carStatValue: {
     fontSize: 20,
     fontWeight: '700',
-    color: colors.text,
     marginTop: 2,
   },
   qrContainer: {
@@ -260,7 +255,6 @@ const styles = StyleSheet.create({
   },
   flipHint: {
     fontSize: 11,
-    color: colors.textTertiary,
     textAlign: 'center',
     marginTop: spacing.sm,
     marginBottom: spacing.lg,
@@ -273,10 +267,8 @@ const styles = StyleSheet.create({
   },
   statBox: {
     width: '48%',
-    backgroundColor: colors.card,
     borderRadius: borderRadius.lg,
     borderWidth: 1,
-    borderColor: colors.cardBorder,
     padding: spacing.md,
     minHeight: 100,
   },
@@ -291,11 +283,9 @@ const styles = StyleSheet.create({
   statValue: {
     fontSize: 28,
     fontWeight: '700',
-    color: colors.text,
   },
   statLabel: {
     fontSize: 12,
-    color: colors.textSecondary,
     textTransform: 'uppercase',
     letterSpacing: 0.5,
     marginTop: spacing.xs,
@@ -307,10 +297,8 @@ const styles = StyleSheet.create({
   modItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: colors.card,
     borderRadius: borderRadius.lg,
     borderWidth: 1,
-    borderColor: colors.cardBorder,
     padding: spacing.md,
     gap: spacing.md,
   },
@@ -320,15 +308,12 @@ const styles = StyleSheet.create({
   modTitle: {
     fontSize: 15,
     fontWeight: '600',
-    color: colors.text,
   },
   modSubtitle: {
     fontSize: 12,
-    color: colors.textSecondary,
     marginTop: 2,
   },
   modArrow: {
     fontSize: 18,
-    color: colors.textTertiary,
   },
 });

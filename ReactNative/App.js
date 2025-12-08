@@ -20,7 +20,8 @@ import RouteDetailScreen from './src/screens/RouteDetailScreen';
 import EventDetailScreen from './src/screens/EventDetailScreen';
 import ModDetailScreen from './src/screens/ModDetailScreen';
 
-import { colors } from './src/styles/theme';
+import { ThemeProvider, useTheme } from './src/context/ThemeContext';
+import { colors as defaultColors } from './src/styles/theme';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -56,6 +57,7 @@ const ProfileIcon = ({ color }) => (
 );
 
 function MainTabs() {
+  const { colors } = useTheme();
   return (
     <Tab.Navigator
       screenOptions={{
@@ -115,9 +117,10 @@ function MainTabs() {
   );
 }
 
-export default function App() {
+function AppContent() {
+  const { colors } = useTheme();
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
       <StatusBar style="light" />
       <NavigationContainer>
         <Stack.Navigator
@@ -141,9 +144,17 @@ export default function App() {
   );
 }
 
+export default function App() {
+  return (
+    <ThemeProvider>
+      <AppContent />
+    </ThemeProvider>
+  );
+}
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: defaultColors.background,
   },
 });
