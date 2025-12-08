@@ -1,14 +1,16 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { colors, spacing } from '../styles/theme';
+import { useTheme } from '../context/ThemeContext';
+import { spacing } from '../styles/theme';
 
 export default function Header({ title, rightIcon, onRightPress }) {
+  const { colors } = useTheme();
   const insets = useSafeAreaInsets();
 
   return (
-    <View style={[styles.container, { paddingTop: insets.top + spacing.sm }]}>
-      <Text style={styles.title}>{title}</Text>
+    <View style={[styles.container, { paddingTop: insets.top + spacing.sm, backgroundColor: colors.background }]}>
+      <Text style={[styles.title, { color: colors.text }]}>{title}</Text>
       {rightIcon && (
         <TouchableOpacity style={styles.iconButton} onPress={onRightPress}>
           {rightIcon}
@@ -25,12 +27,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: spacing.md,
     paddingBottom: spacing.md,
-    backgroundColor: colors.background,
   },
   title: {
     fontSize: 32,
     fontWeight: '700',
-    color: colors.text,
   },
   iconButton: {
     width: 40,

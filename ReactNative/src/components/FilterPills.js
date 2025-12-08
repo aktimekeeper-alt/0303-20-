@@ -1,34 +1,42 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, ScrollView, StyleSheet } from 'react-native';
-import { colors, spacing, borderRadius } from '../styles/theme';
+import { useTheme } from '../context/ThemeContext';
+import { spacing, borderRadius } from '../styles/theme';
 
 export default function FilterPills({ filters, activeFilter, onFilterChange }) {
+  const { colors } = useTheme();
+
   return (
     <ScrollView
       horizontal
       showsHorizontalScrollIndicator={false}
       contentContainerStyle={styles.container}
     >
-      {filters.map((filter) => (
-        <TouchableOpacity
-          key={filter.value}
-          style={[
-            styles.pill,
-            activeFilter === filter.value && styles.pillActive,
-          ]}
-          onPress={() => onFilterChange(filter.value)}
-          activeOpacity={0.7}
-        >
-          <Text
+      {filters.map((filter) => {
+        const isActive = activeFilter === filter.value;
+        return (
+          <TouchableOpacity
+            key={filter.value}
             style={[
-              styles.pillText,
-              activeFilter === filter.value && styles.pillTextActive,
+              styles.pill,
+              { backgroundColor: colors.card, borderColor: colors.cardBorder },
+              isActive && { backgroundColor: colors.primary, borderColor: colors.primary },
             ]}
+            onPress={() => onFilterChange(filter.value)}
+            activeOpacity={0.7}
           >
-            {filter.label}
-          </Text>
-        </TouchableOpacity>
-      ))}
+            <Text
+              style={[
+                styles.pillText,
+                { color: colors.textSecondary },
+                isActive && { color: colors.text },
+              ]}
+            >
+              {filter.label}
+            </Text>
+          </TouchableOpacity>
+        );
+      })}
     </ScrollView>
   );
 }
@@ -43,20 +51,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm,
     borderRadius: borderRadius.lg,
-    backgroundColor: colors.card,
     borderWidth: 1,
-    borderColor: colors.cardBorder,
-  },
-  pillActive: {
-    backgroundColor: colors.primary,
-    borderColor: colors.primary,
   },
   pillText: {
     fontSize: 14,
     fontWeight: '600',
-    color: colors.textSecondary,
-  },
-  pillTextActive: {
-    color: colors.text,
   },
 });
