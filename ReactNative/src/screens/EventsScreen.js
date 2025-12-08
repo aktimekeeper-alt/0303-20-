@@ -1,12 +1,13 @@
-import React, { useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from 'react-native';
+import React, { useState, useRef } from 'react';
+import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Alert, Animated } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import Svg, { Path } from 'react-native-svg';
 import Header from '../components/Header';
 import FilterPills from '../components/FilterPills';
 import { events, formatDate } from '../data/appData';
-import { colors, spacing, borderRadius, shadows } from '../styles/theme';
+import { useTheme } from '../context/ThemeContext';
+import { spacing, borderRadius, shadows } from '../styles/theme';
 
 const CalendarIcon = () => (
   <Svg viewBox="0 0 24 24" width={20} height={20} fill="white">
@@ -27,9 +28,29 @@ const filters = [
   { label: 'Show', value: 'Show' },
 ];
 
-function EventCard({ event, onPress }) {
+function EventCard({ event, onPress, colors }) {
+  const [isRsvped, setIsRsvped] = useState(false);
+  const buttonScale = useRef(new Animated.Value(1)).current;
+
+  const handleRSVP = () => {
+    Animated.sequence([
+      Animated.timing(buttonScale, { toValue: 0.95, duration: 100, useNativeDriver: true }),
+      Animated.timing(buttonScale, { toValue: 1, duration: 100, useNativeDriver: true }),
+    ]).start(() => {
+      if (isRsvped) {
+        Alert.alert('Cancel RSVP?', 'Are you sure you want to cancel your RSVP?', [
+          { text: 'Keep', style: 'cancel' },
+          { text: 'Cancel RSVP', style: 'destructive', onPress: () => setIsRsvped(false) },
+        ]);
+      } else {
+        setIsRsvped(true);
+        Alert.alert('RSVP Confirmed!', `You're going to ${event.title}!`);
+      }
+    });
+  };
+
   return (
-    <TouchableOpacity style={styles.eventCard} onPress={onPress} activeOpacity={0.8}>
+    <TouchableOpacity style={[styles.eventCard, { backgroundColor: colors.card, borderColor: colors.cardBorder }]} onPress={onPress} activeOpacity={0.8}>
       <LinearGradient
         colors={[colors.primary, colors.success]}
         style={styles.eventGradient}
@@ -37,53 +58,62 @@ function EventCard({ event, onPress }) {
         end={{ x: 1, y: 1 }}
       />
       <View style={styles.eventContent}>
-        <Text style={styles.eventTitle}>{event.title}</Text>
-        <Text style={styles.eventOrganizer}>{event.organizer}</Text>
-        <Text style={styles.eventDescription} numberOfLines={2}>
+        <Text style={[styles.eventTitle, { color: colors.text }]}>{event.title}</Text>
+        <Text style={[styles.eventOrganizer, { color: colors.textSecondary }]}>{event.organizer}</Text>
+        <Text style={[styles.eventDescription, { color: colors.textTertiary }]} numberOfLines={2}>
           {event.description}
         </Text>
 
-        <View style={styles.eventInfoBox}>
+        <View style={[styles.eventInfoBox, { backgroundColor: `${colors.primary}1A`, borderColor: `${colors.primary}4D` }]}>
           <View style={styles.eventInfoRow}>
             <View style={styles.eventInfoItem}>
-              <Text style={styles.eventInfoLabel}>Location</Text>
-              <Text style={styles.eventInfoValue}>{event.location}</Text>
+              <Text style={[styles.eventInfoLabel, { color: colors.textSecondary }]}>Location</Text>
+              <Text style={[styles.eventInfoValue, { color: colors.text }]}>{event.location}</Text>
             </View>
             <View style={styles.eventInfoItem}>
-              <Text style={styles.eventInfoLabel}>Time</Text>
-              <Text style={styles.eventInfoValue}>{event.time}</Text>
+              <Text style={[styles.eventInfoLabel, { color: colors.textSecondary }]}>Time</Text>
+              <Text style={[styles.eventInfoValue, { color: colors.text }]}>{event.time}</Text>
             </View>
           </View>
-          <View style={styles.eventInfoDivider} />
+          <View style={[styles.eventInfoDivider, { backgroundColor: 'rgba(255, 255, 255, 0.1)' }]} />
           <View style={styles.eventInfoItem}>
-            <Text style={styles.eventInfoLabel}>Date</Text>
-            <Text style={styles.eventInfoValue}>{formatDate(event.date)}</Text>
+            <Text style={[styles.eventInfoLabel, { color: colors.textSecondary }]}>Date</Text>
+            <Text style={[styles.eventInfoValue, { color: colors.text }]}>{formatDate(event.date)}</Text>
           </View>
         </View>
 
         <View style={styles.tagsRow}>
-          <View style={styles.tag}>
-            <Text style={styles.tagText}>{event.type}</Text>
+          <View style={[styles.tag, { backgroundColor: `${colors.primary}33` }]}>
+            <Text style={[styles.tagText, { color: colors.primary }]}>{event.type}</Text>
           </View>
-          <View style={styles.tag}>
-            <Text style={styles.tagText}>{event.difficulty}</Text>
+          <View style={[styles.tag, { backgroundColor: `${colors.primary}33` }]}>
+            <Text style={[styles.tagText, { color: colors.primary }]}>{event.difficulty}</Text>
           </View>
-          <View style={styles.tag}>
-            <Text style={styles.tagText}>
+          <View style={[styles.tag, { backgroundColor: `${colors.primary}33` }]}>
+            <Text style={[styles.tagText, { color: colors.primary }]}>
               {event.attendees}{event.maxAttendees ? `/${event.maxAttendees}` : '+'} attending
             </Text>
           </View>
         </View>
 
-        <TouchableOpacity style={styles.rsvpButton} activeOpacity={0.8}>
-          <Text style={styles.rsvpButtonText}>RSVP Now</Text>
-        </TouchableOpacity>
+        <Animated.View style={{ transform: [{ scale: buttonScale }] }}>
+          <TouchableOpacity
+            style={[styles.rsvpButton, { backgroundColor: isRsvped ? colors.success : colors.primary }]}
+            activeOpacity={0.8}
+            onPress={handleRSVP}
+          >
+            <Text style={[styles.rsvpButtonText, { color: colors.text }]}>
+              {isRsvped ? "You're Going!" : 'RSVP Now'}
+            </Text>
+          </TouchableOpacity>
+        </Animated.View>
       </View>
     </TouchableOpacity>
   );
 }
 
 export default function EventsScreen({ navigation }) {
+  const { colors } = useTheme();
   const [activeFilter, setActiveFilter] = useState('all');
 
   const filteredEvents = activeFilter === 'all'
@@ -91,7 +121,7 @@ export default function EventsScreen({ navigation }) {
     : events.filter(e => e.type === activeFilter);
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top']}>
       <View style={styles.header}>
         <TouchableOpacity
           style={styles.backButton}
@@ -99,14 +129,14 @@ export default function EventsScreen({ navigation }) {
         >
           <BackIcon />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Events</Text>
+        <Text style={[styles.headerTitle, { color: colors.text }]}>Events</Text>
         <TouchableOpacity style={styles.headerRight}>
           <CalendarIcon />
         </TouchableOpacity>
       </View>
 
       <ScrollView style={styles.scroll} showsVerticalScrollIndicator={false}>
-        <Text style={styles.sectionTitle}>Upcoming Events</Text>
+        <Text style={[styles.sectionTitle, { color: colors.textSecondary }]}>Upcoming Events</Text>
         <FilterPills
           filters={filters}
           activeFilter={activeFilter}
@@ -115,7 +145,7 @@ export default function EventsScreen({ navigation }) {
 
         <View style={styles.listContainer}>
           {filteredEvents.map((event) => (
-            <EventCard key={event.id} event={event} onPress={() => navigation.navigate('EventDetail', { event })} />
+            <EventCard key={event.id} event={event} colors={colors} onPress={() => navigation.navigate('EventDetail', { event })} />
           ))}
         </View>
       </ScrollView>
@@ -124,144 +154,41 @@ export default function EventsScreen({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
+  container: { flex: 1 },
   header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.md,
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
+    paddingHorizontal: spacing.md, paddingVertical: spacing.md,
   },
   backButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
-    justifyContent: 'center',
-    alignItems: 'center',
+    width: 40, height: 40, borderRadius: 20, backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    justifyContent: 'center', alignItems: 'center',
   },
-  headerTitle: {
-    fontSize: 24,
-    fontWeight: '700',
-    color: colors.text,
-  },
+  headerTitle: { fontSize: 24, fontWeight: '700' },
   headerRight: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
-    justifyContent: 'center',
-    alignItems: 'center',
+    width: 40, height: 40, borderRadius: 20, backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    justifyContent: 'center', alignItems: 'center',
   },
-  scroll: {
-    flex: 1,
-  },
+  scroll: { flex: 1 },
   sectionTitle: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: colors.textSecondary,
-    textTransform: 'uppercase',
-    letterSpacing: 1,
-    paddingHorizontal: spacing.md,
-    marginBottom: spacing.sm,
+    fontSize: 13, fontWeight: '600', textTransform: 'uppercase', letterSpacing: 1,
+    paddingHorizontal: spacing.md, marginBottom: spacing.sm,
   },
-  listContainer: {
-    paddingHorizontal: spacing.md,
-    paddingBottom: spacing.xl,
-  },
-  eventCard: {
-    backgroundColor: colors.card,
-    borderRadius: borderRadius.xl,
-    borderWidth: 1,
-    borderColor: colors.cardBorder,
-    overflow: 'hidden',
-    marginBottom: spacing.md,
-  },
-  eventGradient: {
-    height: 100,
-    opacity: 0.4,
-  },
-  eventContent: {
-    padding: spacing.md,
-  },
-  eventTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: colors.text,
-    marginBottom: spacing.xs,
-  },
-  eventOrganizer: {
-    fontSize: 14,
-    color: colors.textSecondary,
-    marginBottom: spacing.sm,
-  },
-  eventDescription: {
-    fontSize: 14,
-    color: colors.textTertiary,
-    lineHeight: 20,
-    marginBottom: spacing.md,
-  },
-  eventInfoBox: {
-    backgroundColor: 'rgba(0, 122, 255, 0.1)',
-    borderRadius: borderRadius.md,
-    borderWidth: 1,
-    borderColor: 'rgba(0, 122, 255, 0.3)',
-    padding: spacing.sm,
-    marginBottom: spacing.md,
-  },
-  eventInfoRow: {
-    flexDirection: 'row',
-  },
-  eventInfoItem: {
-    flex: 1,
-    paddingVertical: spacing.xs,
-  },
-  eventInfoLabel: {
-    fontSize: 12,
-    color: colors.textSecondary,
-    textTransform: 'uppercase',
-    marginBottom: spacing.xs,
-  },
-  eventInfoValue: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: colors.text,
-  },
-  eventInfoDivider: {
-    height: 1,
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
-    marginVertical: spacing.sm,
-  },
-  tagsRow: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: spacing.xs,
-    marginBottom: spacing.md,
-  },
-  tag: {
-    backgroundColor: 'rgba(0, 122, 255, 0.2)',
-    paddingHorizontal: spacing.sm,
-    paddingVertical: spacing.xs,
-    borderRadius: borderRadius.sm,
-  },
-  tagText: {
-    fontSize: 12,
-    color: colors.primary,
-    fontWeight: '500',
-  },
-  rsvpButton: {
-    backgroundColor: colors.primary,
-    borderRadius: borderRadius.md,
-    padding: spacing.md,
-    alignItems: 'center',
-    ...shadows.button,
-  },
-  rsvpButtonText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: colors.text,
-  },
+  listContainer: { paddingHorizontal: spacing.md, paddingBottom: spacing.xl },
+  eventCard: { borderRadius: borderRadius.xl, borderWidth: 1, overflow: 'hidden', marginBottom: spacing.md },
+  eventGradient: { height: 100, opacity: 0.4 },
+  eventContent: { padding: spacing.md },
+  eventTitle: { fontSize: 18, fontWeight: '700', marginBottom: spacing.xs },
+  eventOrganizer: { fontSize: 14, marginBottom: spacing.sm },
+  eventDescription: { fontSize: 14, lineHeight: 20, marginBottom: spacing.md },
+  eventInfoBox: { borderRadius: borderRadius.md, borderWidth: 1, padding: spacing.sm, marginBottom: spacing.md },
+  eventInfoRow: { flexDirection: 'row' },
+  eventInfoItem: { flex: 1, paddingVertical: spacing.xs },
+  eventInfoLabel: { fontSize: 12, textTransform: 'uppercase', marginBottom: spacing.xs },
+  eventInfoValue: { fontSize: 14, fontWeight: '600' },
+  eventInfoDivider: { height: 1, marginVertical: spacing.sm },
+  tagsRow: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.xs, marginBottom: spacing.md },
+  tag: { paddingHorizontal: spacing.sm, paddingVertical: spacing.xs, borderRadius: borderRadius.sm },
+  tagText: { fontSize: 12, fontWeight: '500' },
+  rsvpButton: { borderRadius: borderRadius.md, padding: spacing.md, alignItems: 'center', ...shadows.button },
+  rsvpButtonText: { fontSize: 16, fontWeight: '600' },
 });
