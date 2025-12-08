@@ -5,7 +5,8 @@ import Svg, { Path } from 'react-native-svg';
 import Header from '../components/Header';
 import SearchBar from '../components/SearchBar';
 import { conversations } from '../data/appData';
-import { colors, spacing, borderRadius } from '../styles/theme';
+import { useTheme } from '../context/ThemeContext';
+import { spacing, borderRadius } from '../styles/theme';
 
 const EditIcon = () => (
   <Svg viewBox="0 0 24 24" width={20} height={20} fill="white">
@@ -13,49 +14,49 @@ const EditIcon = () => (
   </Svg>
 );
 
-const GroupIcon = () => (
-  <Svg viewBox="0 0 24 24" width={28} height={28} fill={colors.primary}>
+const GroupIcon = ({ color }) => (
+  <Svg viewBox="0 0 24 24" width={28} height={28} fill={color}>
     <Path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z" />
   </Svg>
 );
 
-const PersonIcon = () => (
-  <Svg viewBox="0 0 24 24" width={28} height={28} fill={colors.primary}>
+const PersonIcon = ({ color }) => (
+  <Svg viewBox="0 0 24 24" width={28} height={28} fill={color}>
     <Path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
   </Svg>
 );
 
-function ConversationItem({ conversation, onPress }) {
+function ConversationItem({ conversation, onPress, colors }) {
   return (
-    <TouchableOpacity style={styles.conversationItem} onPress={onPress} activeOpacity={0.7}>
+    <TouchableOpacity style={[styles.conversationItem, { backgroundColor: colors.card, borderColor: colors.cardBorder }]} onPress={onPress} activeOpacity={0.7}>
       <View style={styles.avatarContainer}>
-        <View style={styles.avatar}>
-          {conversation.type === 'group' ? <GroupIcon /> : <PersonIcon />}
+        <View style={[styles.avatar, { backgroundColor: `${colors.primary}33`, borderColor: `${colors.primary}4D` }]}>
+          {conversation.type === 'group' ? <GroupIcon color={colors.primary} /> : <PersonIcon color={colors.primary} />}
         </View>
         {conversation.unread > 0 && (
-          <View style={styles.unreadBadge}>
-            <Text style={styles.unreadText}>{conversation.unread}</Text>
+          <View style={[styles.unreadBadge, { backgroundColor: colors.danger, borderColor: colors.background }]}>
+            <Text style={[styles.unreadText, { color: colors.text }]}>{conversation.unread}</Text>
           </View>
         )}
       </View>
 
       <View style={styles.conversationContent}>
         <View style={styles.nameRow}>
-          <Text style={styles.name}>{conversation.name}</Text>
+          <Text style={[styles.name, { color: colors.text }]}>{conversation.name}</Text>
           {conversation.type === 'group' && (
-            <Text style={styles.members}>({conversation.members})</Text>
+            <Text style={[styles.members, { color: colors.textSecondary }]}>({conversation.members})</Text>
           )}
         </View>
-        <Text style={styles.lastMessage} numberOfLines={1}>
+        <Text style={[styles.lastMessage, { color: colors.textSecondary }]} numberOfLines={1}>
           {conversation.lastMessage}
         </Text>
       </View>
 
       <View style={styles.metaContainer}>
-        <Text style={styles.time}>{conversation.time}</Text>
+        <Text style={[styles.time, { color: colors.textSecondary }]}>{conversation.time}</Text>
         {conversation.type === 'group' && (
           <View style={styles.groupTag}>
-            <Text style={styles.groupTagText}>GROUP</Text>
+            <Text style={[styles.groupTagText, { color: colors.textTertiary }]}>GROUP</Text>
           </View>
         )}
       </View>
@@ -64,10 +65,11 @@ function ConversationItem({ conversation, onPress }) {
 }
 
 export default function ChatScreen({ navigation }) {
+  const { colors } = useTheme();
   const [searchText, setSearchText] = useState('');
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top']}>
       <Header
         title="Messages"
         rightIcon={<EditIcon />}
@@ -81,13 +83,14 @@ export default function ChatScreen({ navigation }) {
           placeholder="Search conversations..."
         />
 
-        <Text style={styles.sectionTitle}>Conversations</Text>
+        <Text style={[styles.sectionTitle, { color: colors.textSecondary }]}>Conversations</Text>
 
         <View style={styles.listContainer}>
           {conversations.map((conv) => (
             <ConversationItem
               key={conv.id}
               conversation={conv}
+              colors={colors}
               onPress={() => navigation.navigate('ChatDetail', { conversation: conv })}
             />
           ))}
@@ -100,7 +103,6 @@ export default function ChatScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
   },
   scroll: {
     flex: 1,
@@ -108,7 +110,6 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 13,
     fontWeight: '600',
-    color: colors.textSecondary,
     textTransform: 'uppercase',
     letterSpacing: 1,
     paddingHorizontal: spacing.md,
@@ -121,10 +122,8 @@ const styles = StyleSheet.create({
   conversationItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: colors.card,
     borderRadius: borderRadius.lg,
     borderWidth: 1,
-    borderColor: colors.cardBorder,
     padding: spacing.md,
     marginBottom: spacing.sm,
   },
@@ -135,9 +134,7 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: 'rgba(0, 122, 255, 0.2)',
     borderWidth: 2,
-    borderColor: 'rgba(0, 122, 255, 0.3)',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -145,19 +142,16 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: -4,
     right: -4,
-    backgroundColor: colors.danger,
     width: 22,
     height: 22,
     borderRadius: 11,
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 2,
-    borderColor: colors.background,
   },
   unreadText: {
     fontSize: 11,
     fontWeight: '700',
-    color: colors.text,
   },
   conversationContent: {
     flex: 1,
@@ -172,16 +166,13 @@ const styles = StyleSheet.create({
   name: {
     fontSize: 17,
     fontWeight: '600',
-    color: colors.text,
   },
   members: {
     fontSize: 13,
-    color: colors.textSecondary,
     marginLeft: spacing.xs,
   },
   lastMessage: {
     fontSize: 14,
-    color: colors.textSecondary,
   },
   metaContainer: {
     alignItems: 'flex-end',
@@ -189,7 +180,6 @@ const styles = StyleSheet.create({
   },
   time: {
     fontSize: 13,
-    color: colors.textSecondary,
   },
   groupTag: {
     backgroundColor: 'rgba(255, 255, 255, 0.1)',
@@ -200,6 +190,5 @@ const styles = StyleSheet.create({
   groupTagText: {
     fontSize: 10,
     fontWeight: '600',
-    color: colors.textTertiary,
   },
 });

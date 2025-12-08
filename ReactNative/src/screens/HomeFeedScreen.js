@@ -8,16 +8,17 @@ import StatCard from '../components/StatCard';
 import FilterPills from '../components/FilterPills';
 import ContentCard from '../components/ContentCard';
 import { posts } from '../data/appData';
-import { colors, spacing } from '../styles/theme';
+import { useTheme } from '../context/ThemeContext';
+import { spacing } from '../styles/theme';
 
-const CalendarIcon = () => (
-  <Svg viewBox="0 0 24 24" width={22} height={22} fill={colors.warning}>
+const CalendarIcon = ({ color }) => (
+  <Svg viewBox="0 0 24 24" width={22} height={22} fill={color}>
     <Path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zM9 14H7v-2h2v2zm4 0h-2v-2h2v2zm4 0h-2v-2h2v2zm-8 4H7v-2h2v2zm4 0h-2v-2h2v2zm4 0h-2v-2h2v2z" />
   </Svg>
 );
 
-const MapIcon = () => (
-  <Svg viewBox="0 0 24 24" width={22} height={22} fill={colors.success}>
+const MapIcon = ({ color }) => (
+  <Svg viewBox="0 0 24 24" width={22} height={22} fill={color}>
     <Path d="M20.5 3l-.16.03L15 5.1 9 3 3.36 4.9c-.21.07-.36.25-.36.48V20.5c0 .28.22.5.5.5l.16-.03L9 18.9l6 2.1 5.64-1.9c.21-.07.36-.25.36-.48V3.5c0-.28-.22-.5-.5-.5zM15 19l-6-2.11V5l6 2.11V19z" />
   </Svg>
 );
@@ -36,6 +37,7 @@ const filters = [
 ];
 
 export default function HomeFeedScreen({ navigation }) {
+  const { colors } = useTheme();
   const [searchText, setSearchText] = useState('');
   const [activeFilter, setActiveFilter] = useState('all');
 
@@ -44,7 +46,7 @@ export default function HomeFeedScreen({ navigation }) {
     : posts.filter(p => p.category === activeFilter);
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top']}>
       <Header
         title="Burnout"
         rightIcon={<BellIcon />}
@@ -60,7 +62,7 @@ export default function HomeFeedScreen({ navigation }) {
 
         <View style={styles.statsRow}>
           <StatCard
-            icon={<CalendarIcon />}
+            icon={<CalendarIcon color={colors.warning} />}
             value="24"
             label="Upcoming Events"
             iconBgColor="rgba(255, 149, 0, 0.2)"
@@ -68,7 +70,7 @@ export default function HomeFeedScreen({ navigation }) {
           />
           <View style={{ width: spacing.md }} />
           <StatCard
-            icon={<MapIcon />}
+            icon={<MapIcon color={colors.secondary} />}
             value="15"
             label="Active Routes"
             iconBgColor="rgba(52, 199, 89, 0.2)"
@@ -76,7 +78,7 @@ export default function HomeFeedScreen({ navigation }) {
           />
         </View>
 
-        <Text style={styles.sectionTitle}>Feed</Text>
+        <Text style={[styles.sectionTitle, { color: colors.textSecondary }]}>Feed</Text>
         <FilterPills
           filters={filters}
           activeFilter={activeFilter}
@@ -96,7 +98,6 @@ export default function HomeFeedScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
   },
   scroll: {
     flex: 1,
@@ -109,7 +110,6 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 13,
     fontWeight: '600',
-    color: colors.textSecondary,
     textTransform: 'uppercase',
     letterSpacing: 1,
     paddingHorizontal: spacing.md,
