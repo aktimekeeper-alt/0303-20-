@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Alert, Share, Animated, Linking } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import Svg, { Path } from 'react-native-svg';
 import { formatDate } from '../data/appData';
-import { colors, spacing, borderRadius, shadows } from '../styles/theme';
+import { useTheme } from '../context/ThemeContext';
+import { spacing, borderRadius, shadows } from '../styles/theme';
 
 const BackIcon = () => (
   <Svg viewBox="0 0 24 24" width={24} height={24} fill="white">
@@ -12,26 +13,26 @@ const BackIcon = () => (
   </Svg>
 );
 
-const CalendarIcon = () => (
-  <Svg viewBox="0 0 24 24" width={20} height={20} fill={colors.primary}>
+const CalendarIcon = ({ color }) => (
+  <Svg viewBox="0 0 24 24" width={20} height={20} fill={color}>
     <Path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zM9 14H7v-2h2v2zm4 0h-2v-2h2v2zm4 0h-2v-2h2v2zm-8 4H7v-2h2v2zm4 0h-2v-2h2v2zm4 0h-2v-2h2v2z" />
   </Svg>
 );
 
-const TimeIcon = () => (
-  <Svg viewBox="0 0 24 24" width={20} height={20} fill={colors.success}>
+const TimeIcon = ({ color }) => (
+  <Svg viewBox="0 0 24 24" width={20} height={20} fill={color}>
     <Path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z" />
   </Svg>
 );
 
-const LocationIcon = () => (
-  <Svg viewBox="0 0 24 24" width={20} height={20} fill={colors.danger}>
+const LocationIcon = ({ color }) => (
+  <Svg viewBox="0 0 24 24" width={20} height={20} fill={color}>
     <Path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" />
   </Svg>
 );
 
-const PeopleIcon = () => (
-  <Svg viewBox="0 0 24 24" width={20} height={20} fill={colors.purple}>
+const PeopleIcon = ({ color }) => (
+  <Svg viewBox="0 0 24 24" width={20} height={20} fill={color}>
     <Path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z" />
   </Svg>
 );
@@ -42,7 +43,18 @@ const ShareIcon = () => (
   </Svg>
 );
 
+const CheckIcon = () => (
+  <Svg viewBox="0 0 24 24" width={24} height={24} fill="white">
+    <Path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
+  </Svg>
+);
+
 export default function EventDetailScreen({ navigation, route }) {
+  const { colors } = useTheme();
+  const [isRsvped, setIsRsvped] = useState(false);
+  const [attendeeCount, setAttendeeCount] = useState(route.params?.event?.attendees || 47);
+  const [buttonScale] = useState(new Animated.Value(1));
+
   const event = route.params?.event || {
     id: 1,
     title: 'Sunset Canyon Run',
@@ -55,16 +67,84 @@ export default function EventDetailScreen({ navigation, route }) {
     difficulty: 'Intermediate',
     attendees: 47,
     maxAttendees: 60,
+    coordinates: { lat: 34.2356, lng: -118.1367 },
   };
 
-  const [isRsvped, setIsRsvped] = useState(false);
-
   const attendeePercentage = event.maxAttendees
-    ? (event.attendees / event.maxAttendees) * 100
+    ? (attendeeCount / event.maxAttendees) * 100
     : 100;
 
+  const handleRSVP = () => {
+    // Animate button press
+    Animated.sequence([
+      Animated.timing(buttonScale, {
+        toValue: 0.95,
+        duration: 100,
+        useNativeDriver: true,
+      }),
+      Animated.timing(buttonScale, {
+        toValue: 1,
+        duration: 100,
+        useNativeDriver: true,
+      }),
+    ]).start();
+
+    if (isRsvped) {
+      Alert.alert(
+        'Cancel RSVP?',
+        'Are you sure you want to cancel your RSVP for this event?',
+        [
+          { text: 'Keep RSVP', style: 'cancel' },
+          {
+            text: 'Cancel RSVP',
+            style: 'destructive',
+            onPress: () => {
+              setIsRsvped(false);
+              setAttendeeCount(prev => prev - 1);
+              Alert.alert('RSVP Cancelled', 'Your spot has been released.');
+            },
+          },
+        ]
+      );
+    } else {
+      if (event.maxAttendees && attendeeCount >= event.maxAttendees) {
+        Alert.alert('Event Full', 'Sorry, this event is at capacity. Would you like to join the waitlist?', [
+          { text: 'No Thanks', style: 'cancel' },
+          { text: 'Join Waitlist', onPress: () => Alert.alert('Added to Waitlist', 'We\'ll notify you if a spot opens up!') },
+        ]);
+        return;
+      }
+
+      setIsRsvped(true);
+      setAttendeeCount(prev => prev + 1);
+      Alert.alert(
+        'RSVP Confirmed!',
+        `You're going to ${event.title}! We'll send you a reminder before the event.`,
+        [{ text: 'Awesome!' }]
+      );
+    }
+  };
+
+  const handleShare = async () => {
+    try {
+      await Share.share({
+        message: `Join me at ${event.title}!\n\n${event.description}\n\nDate: ${formatDate(event.date)}\nTime: ${event.time}\nLocation: ${event.location}`,
+        title: event.title,
+      });
+    } catch (error) {
+      Alert.alert('Error', 'Unable to share event');
+    }
+  };
+
+  const handleLocationPress = async () => {
+    const lat = event.coordinates?.lat || 34.2356;
+    const lng = event.coordinates?.lng || -118.1367;
+    const url = `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
+    await Linking.openURL(url);
+  };
+
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top']}>
       <View style={styles.header}>
         <TouchableOpacity
           style={styles.backButton}
@@ -72,8 +152,8 @@ export default function EventDetailScreen({ navigation, route }) {
         >
           <BackIcon />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Event Details</Text>
-        <TouchableOpacity style={styles.shareButton}>
+        <Text style={[styles.headerTitle, { color: colors.text }]}>Event Details</Text>
+        <TouchableOpacity style={styles.shareButton} onPress={handleShare}>
           <ShareIcon />
         </TouchableOpacity>
       </View>
@@ -81,67 +161,77 @@ export default function EventDetailScreen({ navigation, route }) {
       <ScrollView style={styles.scroll} showsVerticalScrollIndicator={false}>
         <View style={styles.bannerContainer}>
           <LinearGradient
-            colors={[colors.primary, colors.success]}
+            colors={[colors.primary, colors.secondary]}
             style={styles.banner}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
           />
+          {isRsvped && (
+            <View style={styles.rsvpBadge}>
+              <CheckIcon />
+              <Text style={styles.rsvpBadgeText}>You're Going!</Text>
+            </View>
+          )}
         </View>
 
         <View style={styles.content}>
           <View style={styles.tagsRow}>
-            <View style={styles.tag}>
-              <Text style={styles.tagText}>{event.type}</Text>
+            <View style={[styles.tag, { backgroundColor: `${colors.primary}33` }]}>
+              <Text style={[styles.tagText, { color: colors.primary }]}>{event.type}</Text>
             </View>
-            <View style={styles.tag}>
-              <Text style={styles.tagText}>{event.difficulty}</Text>
+            <View style={[styles.tag, { backgroundColor: `${colors.primary}33` }]}>
+              <Text style={[styles.tagText, { color: colors.primary }]}>{event.difficulty}</Text>
             </View>
           </View>
 
-          <Text style={styles.eventTitle}>{event.title}</Text>
-          <Text style={styles.organizer}>by {event.organizer}</Text>
+          <Text style={[styles.eventTitle, { color: colors.text }]}>{event.title}</Text>
+          <Text style={[styles.organizer, { color: colors.textSecondary }]}>by {event.organizer}</Text>
 
-          <Text style={styles.description}>{event.description}</Text>
+          <Text style={[styles.description, { color: colors.textSecondary }]}>{event.description}</Text>
 
-          <View style={styles.infoList}>
-            <View style={styles.infoItem}>
-              <View style={[styles.infoIcon, { backgroundColor: 'rgba(0, 122, 255, 0.2)' }]}>
-                <CalendarIcon />
+          <View style={[styles.infoList, { backgroundColor: colors.card, borderColor: colors.cardBorder }]}>
+            <View style={[styles.infoItem, { borderBottomColor: colors.cardBorder }]}>
+              <View style={[styles.infoIcon, { backgroundColor: `${colors.primary}33` }]}>
+                <CalendarIcon color={colors.primary} />
               </View>
               <View style={styles.infoContent}>
-                <Text style={styles.infoLabel}>Date</Text>
-                <Text style={styles.infoValue}>{formatDate(event.date)}</Text>
+                <Text style={[styles.infoLabel, { color: colors.textSecondary }]}>Date</Text>
+                <Text style={[styles.infoValue, { color: colors.text }]}>{formatDate(event.date)}</Text>
               </View>
             </View>
 
-            <View style={styles.infoItem}>
-              <View style={[styles.infoIcon, { backgroundColor: 'rgba(52, 199, 89, 0.2)' }]}>
-                <TimeIcon />
+            <View style={[styles.infoItem, { borderBottomColor: colors.cardBorder }]}>
+              <View style={[styles.infoIcon, { backgroundColor: `${colors.secondary}33` }]}>
+                <TimeIcon color={colors.secondary} />
               </View>
               <View style={styles.infoContent}>
-                <Text style={styles.infoLabel}>Time</Text>
-                <Text style={styles.infoValue}>{event.time}</Text>
+                <Text style={[styles.infoLabel, { color: colors.textSecondary }]}>Time</Text>
+                <Text style={[styles.infoValue, { color: colors.text }]}>{event.time}</Text>
               </View>
             </View>
 
-            <View style={styles.infoItem}>
+            <TouchableOpacity
+              style={[styles.infoItem, { borderBottomColor: colors.cardBorder }]}
+              onPress={handleLocationPress}
+            >
               <View style={[styles.infoIcon, { backgroundColor: 'rgba(255, 59, 48, 0.2)' }]}>
-                <LocationIcon />
+                <LocationIcon color={colors.danger} />
               </View>
               <View style={styles.infoContent}>
-                <Text style={styles.infoLabel}>Location</Text>
-                <Text style={styles.infoValue}>{event.location}</Text>
+                <Text style={[styles.infoLabel, { color: colors.textSecondary }]}>Location</Text>
+                <Text style={[styles.infoValue, { color: colors.primary }]}>{event.location}</Text>
+                <Text style={[styles.infoHint, { color: colors.textTertiary }]}>Tap to open in Maps</Text>
               </View>
-            </View>
+            </TouchableOpacity>
 
-            <View style={styles.infoItem}>
+            <View style={[styles.infoItem, { borderBottomWidth: 0 }]}>
               <View style={[styles.infoIcon, { backgroundColor: 'rgba(175, 82, 222, 0.2)' }]}>
-                <PeopleIcon />
+                <PeopleIcon color={colors.purple} />
               </View>
               <View style={styles.infoContent}>
-                <Text style={styles.infoLabel}>Attendees</Text>
-                <Text style={styles.infoValue}>
-                  {event.attendees}{event.maxAttendees ? ` / ${event.maxAttendees}` : '+'}
+                <Text style={[styles.infoLabel, { color: colors.textSecondary }]}>Attendees</Text>
+                <Text style={[styles.infoValue, { color: colors.text }]}>
+                  {attendeeCount}{event.maxAttendees ? ` / ${event.maxAttendees}` : '+'}
                 </Text>
               </View>
             </View>
@@ -150,25 +240,43 @@ export default function EventDetailScreen({ navigation, route }) {
           {event.maxAttendees && (
             <View style={styles.progressSection}>
               <View style={styles.progressBar}>
-                <View style={[styles.progressFill, { width: `${attendeePercentage}%` }]} />
+                <Animated.View
+                  style={[
+                    styles.progressFill,
+                    {
+                      width: `${Math.min(attendeePercentage, 100)}%`,
+                      backgroundColor: attendeePercentage >= 90 ? colors.danger : colors.primary,
+                    }
+                  ]}
+                />
               </View>
-              <Text style={styles.progressText}>
-                {event.maxAttendees - event.attendees} spots remaining
+              <Text style={[styles.progressText, { color: colors.textSecondary }]}>
+                {attendeePercentage >= 100
+                  ? 'Event is full!'
+                  : `${event.maxAttendees - attendeeCount} spots remaining`
+                }
               </Text>
             </View>
           )}
         </View>
       </ScrollView>
 
-      <View style={styles.bottomActions}>
-        <TouchableOpacity
-          style={[styles.rsvpButton, isRsvped && styles.rsvpButtonActive]}
-          onPress={() => setIsRsvped(!isRsvped)}
-        >
-          <Text style={styles.rsvpButtonText}>
-            {isRsvped ? 'Cancel RSVP' : 'RSVP Now'}
-          </Text>
-        </TouchableOpacity>
+      <View style={[styles.bottomActions, { borderTopColor: colors.cardBorder, backgroundColor: colors.background }]}>
+        <Animated.View style={{ flex: 1, transform: [{ scale: buttonScale }] }}>
+          <TouchableOpacity
+            style={[
+              styles.rsvpButton,
+              { backgroundColor: isRsvped ? colors.danger : colors.primary }
+            ]}
+            onPress={handleRSVP}
+            activeOpacity={0.8}
+          >
+            {isRsvped && <CheckIcon />}
+            <Text style={[styles.rsvpButtonText, { color: colors.text }]}>
+              {isRsvped ? 'Cancel RSVP' : 'RSVP Now'}
+            </Text>
+          </TouchableOpacity>
+        </Animated.View>
       </View>
     </SafeAreaView>
   );
@@ -177,7 +285,6 @@ export default function EventDetailScreen({ navigation, route }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
   },
   header: {
     flexDirection: 'row',
@@ -197,7 +304,6 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 18,
     fontWeight: '700',
-    color: colors.text,
   },
   shareButton: {
     width: 40,
@@ -215,10 +321,28 @@ const styles = StyleSheet.create({
     marginHorizontal: spacing.md,
     borderRadius: borderRadius.xl,
     overflow: 'hidden',
+    position: 'relative',
   },
   banner: {
     flex: 1,
-    opacity: 0.6,
+    opacity: 0.7,
+  },
+  rsvpBadge: {
+    position: 'absolute',
+    top: spacing.md,
+    right: spacing.md,
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(52, 199, 89, 0.9)',
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+    borderRadius: borderRadius.md,
+    gap: spacing.xs,
+  },
+  rsvpBadgeText: {
+    color: '#FFF',
+    fontWeight: '600',
+    fontSize: 14,
   },
   content: {
     padding: spacing.md,
@@ -229,38 +353,31 @@ const styles = StyleSheet.create({
     marginBottom: spacing.sm,
   },
   tag: {
-    backgroundColor: 'rgba(0, 122, 255, 0.2)',
     paddingHorizontal: spacing.sm,
     paddingVertical: spacing.xs,
     borderRadius: borderRadius.sm,
   },
   tagText: {
     fontSize: 12,
-    color: colors.primary,
     fontWeight: '500',
   },
   eventTitle: {
     fontSize: 28,
     fontWeight: '700',
-    color: colors.text,
     marginBottom: spacing.xs,
   },
   organizer: {
     fontSize: 15,
-    color: colors.textSecondary,
     marginBottom: spacing.md,
   },
   description: {
     fontSize: 16,
-    color: colors.textSecondary,
     lineHeight: 24,
     marginBottom: spacing.lg,
   },
   infoList: {
-    backgroundColor: colors.card,
     borderRadius: borderRadius.lg,
     borderWidth: 1,
-    borderColor: colors.cardBorder,
     overflow: 'hidden',
     marginBottom: spacing.lg,
   },
@@ -269,7 +386,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: spacing.md,
     borderBottomWidth: 1,
-    borderBottomColor: colors.cardBorder,
   },
   infoIcon: {
     width: 40,
@@ -284,14 +400,16 @@ const styles = StyleSheet.create({
   },
   infoLabel: {
     fontSize: 12,
-    color: colors.textSecondary,
     textTransform: 'uppercase',
     letterSpacing: 0.5,
   },
   infoValue: {
     fontSize: 16,
     fontWeight: '600',
-    color: colors.text,
+    marginTop: 2,
+  },
+  infoHint: {
+    fontSize: 11,
     marginTop: 2,
   },
   progressSection: {
@@ -306,33 +424,27 @@ const styles = StyleSheet.create({
   },
   progressFill: {
     height: '100%',
-    backgroundColor: colors.primary,
     borderRadius: 4,
   },
   progressText: {
     fontSize: 13,
-    color: colors.textSecondary,
     textAlign: 'center',
   },
   bottomActions: {
     padding: spacing.md,
     borderTopWidth: 1,
-    borderTopColor: colors.cardBorder,
-    backgroundColor: colors.background,
   },
   rsvpButton: {
-    backgroundColor: colors.primary,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: spacing.sm,
     borderRadius: borderRadius.lg,
     padding: spacing.md,
-    alignItems: 'center',
     ...shadows.button,
-  },
-  rsvpButtonActive: {
-    backgroundColor: colors.danger,
   },
   rsvpButtonText: {
     fontSize: 16,
     fontWeight: '600',
-    color: colors.text,
   },
 });

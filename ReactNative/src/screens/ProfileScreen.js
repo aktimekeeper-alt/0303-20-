@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Animated } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -67,6 +67,7 @@ const StatIcon = ({ type, colors }) => {
 export default function ProfileScreen({ navigation }) {
   const { colors } = useTheme();
   const [isFlipped, setIsFlipped] = useState(false);
+  const flipAnimation = useRef(new Animated.Value(0)).current;
   const profile = profiles[0];
 
   const stats = [
@@ -75,6 +76,48 @@ export default function ProfileScreen({ navigation }) {
     { key: 'meets', value: profile.stats.meetsAttended, label: 'Meets', color: 'rgba(255, 59, 48, 0.2)', link: 'Events' },
     { key: 'trackDays', value: profile.stats.trackDays || 0, label: 'Track Days', color: 'rgba(175, 82, 222, 0.2)', link: 'Routes' },
   ];
+
+  const handleFlip = () => {
+    const toValue = isFlipped ? 0 : 1;
+    Animated.spring(flipAnimation, {
+      toValue,
+      friction: 8,
+      tension: 10,
+      useNativeDriver: true,
+    }).start();
+    setIsFlipped(!isFlipped);
+  };
+
+  // Front card animation
+  const frontAnimatedStyle = {
+    transform: [
+      {
+        rotateY: flipAnimation.interpolate({
+          inputRange: [0, 1],
+          outputRange: ['0deg', '180deg'],
+        }),
+      },
+    ],
+    backfaceVisibility: 'hidden',
+  };
+
+  // Back card animation
+  const backAnimatedStyle = {
+    transform: [
+      {
+        rotateY: flipAnimation.interpolate({
+          inputRange: [0, 1],
+          outputRange: ['180deg', '360deg'],
+        }),
+      },
+    ],
+    backfaceVisibility: 'hidden',
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+  };
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top']}>
@@ -87,13 +130,14 @@ export default function ProfileScreen({ navigation }) {
       <ScrollView style={styles.scroll} showsVerticalScrollIndicator={false}>
         <Text style={[styles.sectionTitle, { color: colors.textSecondary }]}>My Garage</Text>
 
-        {/* Flip Card */}
+        {/* Animated Flip Card */}
         <TouchableOpacity
           style={styles.flipCard}
-          onPress={() => setIsFlipped(!isFlipped)}
-          activeOpacity={0.9}
+          onPress={handleFlip}
+          activeOpacity={0.95}
         >
-          {!isFlipped ? (
+          {/* Front of card */}
+          <Animated.View style={[styles.cardSide, frontAnimatedStyle]}>
             <LinearGradient
               colors={[colors.primary, '#0055CC']}
               style={styles.cardFront}
@@ -116,7 +160,10 @@ export default function ProfileScreen({ navigation }) {
                 </View>
               </View>
             </LinearGradient>
-          ) : (
+          </Animated.View>
+
+          {/* Back of card */}
+          <Animated.View style={[styles.cardSide, backAnimatedStyle]}>
             <View style={styles.cardBack}>
               <View style={styles.qrContainer}>
                 <QRCode />
@@ -124,7 +171,7 @@ export default function ProfileScreen({ navigation }) {
               <Text style={styles.qrLabel}>Scan to Follow</Text>
               <Text style={styles.qrUsername}>{profile.username}</Text>
             </View>
-          )}
+          </Animated.View>
         </TouchableOpacity>
         <Text style={[styles.flipHint, { color: colors.textTertiary }]}>Tap card to flip</Text>
 
@@ -184,13 +231,18 @@ const styles = StyleSheet.create({
   flipCard: {
     height: 200,
     borderRadius: borderRadius.xl,
-    overflow: 'hidden',
     ...shadows.card,
+  },
+  cardSide: {
+    height: 200,
+    borderRadius: borderRadius.xl,
+    overflow: 'hidden',
   },
   cardFront: {
     flex: 1,
     padding: spacing.lg,
     justifyContent: 'space-between',
+    borderRadius: borderRadius.xl,
   },
   cardBack: {
     flex: 1,
@@ -198,6 +250,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     padding: spacing.lg,
+    borderRadius: borderRadius.xl,
   },
   carModel: {
     fontSize: 26,
