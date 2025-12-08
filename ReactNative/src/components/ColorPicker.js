@@ -307,6 +307,7 @@ const styles = StyleSheet.create({
   sliderContainer: {
     width: '100%',
     marginBottom: 16,
+    alignItems: 'center',
   },
   sliderLabel: {
     fontSize: 12,
@@ -314,6 +315,8 @@ const styles = StyleSheet.create({
     marginBottom: 8,
     textTransform: 'uppercase',
     letterSpacing: 1,
+    textAlign: 'center',
+    width: '100%',
   },
   sliderTrack: {
     width: 200,
@@ -321,7 +324,6 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     overflow: 'hidden',
     position: 'relative',
-    alignSelf: 'center',
   },
   satGradient: {
     flex: 1,
