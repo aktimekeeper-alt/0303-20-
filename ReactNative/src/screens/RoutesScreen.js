@@ -1,12 +1,13 @@
-import React, { useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from 'react-native';
+import React, { useState, useRef } from 'react';
+import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Animated } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import Svg, { Path } from 'react-native-svg';
 import Header from '../components/Header';
 import FilterPills from '../components/FilterPills';
 import { routes } from '../data/appData';
-import { colors, spacing, borderRadius } from '../styles/theme';
+import { useTheme } from '../context/ThemeContext';
+import { spacing, borderRadius } from '../styles/theme';
 
 const SearchIcon = () => (
   <Svg viewBox="0 0 24 24" width={20} height={20} fill="white">
@@ -27,58 +28,77 @@ const filters = [
   { label: 'Urban', value: 'urban' },
 ];
 
-function RouteCard({ route, onPress }) {
+function RouteCard({ route, onPress, colors }) {
+  const scaleAnim = useRef(new Animated.Value(1)).current;
+
+  const handlePressIn = () => {
+    Animated.spring(scaleAnim, { toValue: 0.98, friction: 3, useNativeDriver: true }).start();
+  };
+
+  const handlePressOut = () => {
+    Animated.spring(scaleAnim, { toValue: 1, friction: 3, useNativeDriver: true }).start();
+  };
+
   return (
-    <TouchableOpacity style={styles.routeCard} onPress={onPress} activeOpacity={0.8}>
-      <LinearGradient
-        colors={[colors.primary, colors.success]}
-        style={styles.routeGradient}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
-      />
-      <View style={styles.routeContent}>
-        <Text style={styles.routeTitle}>{route.name}</Text>
-        <View style={styles.ratingRow}>
-          <StarIcon />
-          <Text style={styles.ratingText}>
-            {route.rating} ({route.reviews} reviews)
+    <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
+      <TouchableOpacity
+        style={[styles.routeCard, { backgroundColor: colors.card, borderColor: colors.cardBorder }]}
+        onPress={onPress}
+        onPressIn={handlePressIn}
+        onPressOut={handlePressOut}
+        activeOpacity={1}
+      >
+        <LinearGradient
+          colors={[colors.primary, colors.success]}
+          style={styles.routeGradient}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+        />
+        <View style={styles.routeContent}>
+          <Text style={[styles.routeTitle, { color: colors.text }]}>{route.name}</Text>
+          <View style={styles.ratingRow}>
+            <StarIcon />
+            <Text style={[styles.ratingText, { color: colors.textSecondary }]}>
+              {route.rating} ({route.reviews} reviews)
+            </Text>
+          </View>
+          <Text style={[styles.routeDescription, { color: colors.textTertiary }]} numberOfLines={2}>
+            {route.description}
           </Text>
-        </View>
-        <Text style={styles.routeDescription} numberOfLines={2}>
-          {route.description}
-        </Text>
 
-        <View style={styles.tagsRow}>
-          <View style={styles.tag}>
-            <Text style={styles.tagText}>{route.distance}</Text>
+          <View style={styles.tagsRow}>
+            <View style={[styles.tag, { backgroundColor: `${colors.primary}33` }]}>
+              <Text style={[styles.tagText, { color: colors.primary }]}>{route.distance}</Text>
+            </View>
+            <View style={[styles.tag, { backgroundColor: `${colors.primary}33` }]}>
+              <Text style={[styles.tagText, { color: colors.primary }]}>{route.duration}</Text>
+            </View>
+            <View style={[styles.tag, { backgroundColor: `${colors.primary}33` }]}>
+              <Text style={[styles.tagText, { color: colors.primary }]}>{route.elevation}</Text>
+            </View>
+            <View style={[styles.tag, { backgroundColor: `${colors.primary}33` }]}>
+              <Text style={[styles.tagText, { color: colors.primary }]}>{route.difficulty}</Text>
+            </View>
           </View>
-          <View style={styles.tag}>
-            <Text style={styles.tagText}>{route.duration}</Text>
-          </View>
-          <View style={styles.tag}>
-            <Text style={styles.tagText}>{route.elevation}</Text>
-          </View>
-          <View style={styles.tag}>
-            <Text style={styles.tagText}>{route.difficulty}</Text>
-          </View>
-        </View>
 
-        <View style={styles.waypointsSection}>
-          <Text style={styles.waypointsLabel}>Waypoints:</Text>
-          <Text style={styles.waypointsText}>
-            {route.waypoints.join(' > ')}
-          </Text>
+          <View style={[styles.waypointsSection, { borderTopColor: colors.cardBorder }]}>
+            <Text style={[styles.waypointsLabel, { color: colors.textSecondary }]}>Waypoints:</Text>
+            <Text style={[styles.waypointsText, { color: colors.textSecondary }]}>
+              {route.waypoints.join(' > ')}
+            </Text>
+          </View>
         </View>
-      </View>
-    </TouchableOpacity>
+      </TouchableOpacity>
+    </Animated.View>
   );
 }
 
 export default function RoutesScreen({ navigation }) {
+  const { colors } = useTheme();
   const [activeFilter, setActiveFilter] = useState('all');
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top']}>
       <Header
         title="Routes"
         rightIcon={<SearchIcon />}
@@ -86,7 +106,7 @@ export default function RoutesScreen({ navigation }) {
       />
 
       <ScrollView style={styles.scroll} showsVerticalScrollIndicator={false}>
-        <Text style={styles.sectionTitle}>Popular Routes</Text>
+        <Text style={[styles.sectionTitle, { color: colors.textSecondary }]}>Popular Routes</Text>
         <FilterPills
           filters={filters}
           activeFilter={activeFilter}
@@ -95,7 +115,7 @@ export default function RoutesScreen({ navigation }) {
 
         <View style={styles.listContainer}>
           {routes.map((route) => (
-            <RouteCard key={route.id} route={route} onPress={() => navigation.navigate('RouteDetail', { route })} />
+            <RouteCard key={route.id} route={route} colors={colors} onPress={() => navigation.navigate('RouteDetail', { route })} />
           ))}
         </View>
       </ScrollView>
@@ -104,92 +124,24 @@ export default function RoutesScreen({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  scroll: {
-    flex: 1,
-  },
+  container: { flex: 1 },
+  scroll: { flex: 1 },
   sectionTitle: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: colors.textSecondary,
-    textTransform: 'uppercase',
-    letterSpacing: 1,
-    paddingHorizontal: spacing.md,
-    marginBottom: spacing.sm,
+    fontSize: 13, fontWeight: '600', textTransform: 'uppercase', letterSpacing: 1,
+    paddingHorizontal: spacing.md, marginBottom: spacing.sm,
   },
-  listContainer: {
-    paddingHorizontal: spacing.md,
-    paddingBottom: spacing.xl,
-  },
-  routeCard: {
-    backgroundColor: colors.card,
-    borderRadius: borderRadius.xl,
-    borderWidth: 1,
-    borderColor: colors.cardBorder,
-    overflow: 'hidden',
-    marginBottom: spacing.md,
-  },
-  routeGradient: {
-    height: 100,
-    opacity: 0.4,
-  },
-  routeContent: {
-    padding: spacing.md,
-  },
-  routeTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: colors.text,
-    marginBottom: spacing.xs,
-  },
-  ratingRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.xs,
-    marginBottom: spacing.sm,
-  },
-  ratingText: {
-    fontSize: 14,
-    color: colors.textSecondary,
-  },
-  routeDescription: {
-    fontSize: 14,
-    color: colors.textTertiary,
-    lineHeight: 20,
-    marginBottom: spacing.sm,
-  },
-  tagsRow: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: spacing.xs,
-    marginBottom: spacing.md,
-  },
-  tag: {
-    backgroundColor: 'rgba(0, 122, 255, 0.2)',
-    paddingHorizontal: spacing.sm,
-    paddingVertical: spacing.xs,
-    borderRadius: borderRadius.sm,
-  },
-  tagText: {
-    fontSize: 12,
-    color: colors.primary,
-    fontWeight: '500',
-  },
-  waypointsSection: {
-    paddingTop: spacing.sm,
-    borderTopWidth: 1,
-    borderTopColor: colors.cardBorder,
-  },
-  waypointsLabel: {
-    fontSize: 13,
-    color: colors.textSecondary,
-    marginBottom: spacing.xs,
-  },
-  waypointsText: {
-    fontSize: 14,
-    color: colors.textSecondary,
-  },
+  listContainer: { paddingHorizontal: spacing.md, paddingBottom: spacing.xl },
+  routeCard: { borderRadius: borderRadius.xl, borderWidth: 1, overflow: 'hidden', marginBottom: spacing.md },
+  routeGradient: { height: 100, opacity: 0.4 },
+  routeContent: { padding: spacing.md },
+  routeTitle: { fontSize: 18, fontWeight: '700', marginBottom: spacing.xs },
+  ratingRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.xs, marginBottom: spacing.sm },
+  ratingText: { fontSize: 14 },
+  routeDescription: { fontSize: 14, lineHeight: 20, marginBottom: spacing.sm },
+  tagsRow: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.xs, marginBottom: spacing.md },
+  tag: { paddingHorizontal: spacing.sm, paddingVertical: spacing.xs, borderRadius: borderRadius.sm },
+  tagText: { fontSize: 12, fontWeight: '500' },
+  waypointsSection: { paddingTop: spacing.sm, borderTopWidth: 1 },
+  waypointsLabel: { fontSize: 13, marginBottom: spacing.xs },
+  waypointsText: { fontSize: 14 },
 });
