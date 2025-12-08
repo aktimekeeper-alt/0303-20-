@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Modal, PanResponder, Dimensions } from 'react-native';
 import Svg, { Circle, Defs, LinearGradient, Stop, Rect } from 'react-native-svg';
+import { useTheme } from '../context/ThemeContext';
 
 const WHEEL_SIZE = 220;
 const WHEEL_WIDTH = 30;
@@ -42,6 +43,7 @@ function hexToHsl(hex) {
 }
 
 export default function ColorPicker({ visible, onClose, onSelect, currentColor, title }) {
+  const { colors, isDarkMode } = useTheme();
   const initialHsl = hexToHsl(currentColor || '#007AFF');
   const [hue, setHue] = useState(initialHsl.h);
   const [saturation, setSaturation] = useState(initialHsl.s);
@@ -51,6 +53,10 @@ export default function ColorPicker({ visible, onClose, onSelect, currentColor, 
   const sliderRef = useRef(null);
 
   const selectedColor = hslToHex(hue, saturation, lightness);
+  const modalBgColor = isDarkMode ? '#1C1C1E' : '#FFFFFF';
+  const textColor = isDarkMode ? '#FFF' : '#000';
+  const secondaryTextColor = isDarkMode ? 'rgba(255,255,255,0.6)' : 'rgba(0,0,0,0.6)';
+  const cancelBgColor = isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)';
 
   // Color wheel touch handler
   const wheelPanResponder = useRef(
@@ -128,13 +134,13 @@ export default function ColorPicker({ visible, onClose, onSelect, currentColor, 
   return (
     <Modal visible={visible} transparent animationType="fade">
       <View style={styles.overlay}>
-        <View style={styles.modal}>
-          <Text style={styles.title}>{title || 'Pick Color'}</Text>
+        <View style={[styles.modal, { backgroundColor: modalBgColor }]}>
+          <Text style={[styles.title, { color: textColor }]}>{title || 'Pick Color'}</Text>
 
           {/* Color Preview */}
           <View style={styles.preview}>
             <View style={[styles.previewColor, { backgroundColor: selectedColor }]} />
-            <Text style={styles.previewText}>{selectedColor}</Text>
+            <Text style={[styles.previewText, { color: secondaryTextColor }]}>{selectedColor}</Text>
           </View>
 
           {/* Color Wheel */}
@@ -184,7 +190,7 @@ export default function ColorPicker({ visible, onClose, onSelect, currentColor, 
                 cx={WHEEL_SIZE / 2}
                 cy={WHEEL_SIZE / 2}
                 r={(WHEEL_SIZE - WHEEL_WIDTH * 2) / 2}
-                fill="#1C1C1E"
+                fill={modalBgColor}
               />
               {/* Center color preview */}
               <Circle
@@ -209,7 +215,7 @@ export default function ColorPicker({ visible, onClose, onSelect, currentColor, 
 
           {/* Saturation Slider */}
           <View style={styles.sliderContainer}>
-            <Text style={styles.sliderLabel}>Saturation</Text>
+            <Text style={[styles.sliderLabel, { color: secondaryTextColor }]}>Saturation</Text>
             <View style={styles.sliderTrack} {...satPanResponder.panHandlers}>
               <View style={[styles.satGradient, {
                 backgroundImage: `linear-gradient(to right, ${hslToHex(hue, 0, lightness)}, ${hslToHex(hue, 100, lightness)})`
@@ -223,7 +229,7 @@ export default function ColorPicker({ visible, onClose, onSelect, currentColor, 
 
           {/* Lightness Slider */}
           <View style={styles.sliderContainer}>
-            <Text style={styles.sliderLabel}>Brightness</Text>
+            <Text style={[styles.sliderLabel, { color: secondaryTextColor }]}>Brightness</Text>
             <View style={styles.sliderTrack} {...lightPanResponder.panHandlers}>
               <View style={styles.satGradient}>
                 <View style={[styles.gradientLeft, { backgroundColor: hslToHex(hue, saturation, 10) }]} />
@@ -235,8 +241,8 @@ export default function ColorPicker({ visible, onClose, onSelect, currentColor, 
 
           {/* Buttons */}
           <View style={styles.buttons}>
-            <TouchableOpacity style={styles.cancelBtn} onPress={onClose}>
-              <Text style={styles.cancelText}>Cancel</Text>
+            <TouchableOpacity style={[styles.cancelBtn, { backgroundColor: cancelBgColor }]} onPress={onClose}>
+              <Text style={[styles.cancelText, { color: textColor }]}>Cancel</Text>
             </TouchableOpacity>
             <TouchableOpacity style={[styles.selectBtn, { backgroundColor: selectedColor }]} onPress={handleSelect}>
               <Text style={styles.selectText}>Select</Text>
@@ -307,6 +313,7 @@ const styles = StyleSheet.create({
   sliderContainer: {
     width: '100%',
     marginBottom: 16,
+    alignItems: 'center',
   },
   sliderLabel: {
     fontSize: 12,
@@ -314,6 +321,8 @@ const styles = StyleSheet.create({
     marginBottom: 8,
     textTransform: 'uppercase',
     letterSpacing: 1,
+    textAlign: 'center',
+    width: '100%',
   },
   sliderTrack: {
     width: 200,
@@ -321,7 +330,6 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     overflow: 'hidden',
     position: 'relative',
-    alignSelf: 'center',
   },
   satGradient: {
     flex: 1,

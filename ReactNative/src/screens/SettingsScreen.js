@@ -1,42 +1,73 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Switch, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import Svg, { Path } from 'react-native-svg';
 import { useTheme } from '../context/ThemeContext';
 import ColorPicker from '../components/ColorPicker';
 import { spacing, borderRadius } from '../styles/theme';
 
-const BackIcon = () => (
-  <Svg viewBox="0 0 24 24" width={24} height={24} fill="white">
+const BackIcon = ({ color }) => (
+  <Svg viewBox="0 0 24 24" width={24} height={24} fill={color || 'white'}>
     <Path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" />
   </Svg>
 );
 
-const ChevronRight = () => (
-  <Svg viewBox="0 0 24 24" width={20} height={20} fill="rgba(255,255,255,0.4)">
+const ChevronRight = ({ color }) => (
+  <Svg viewBox="0 0 24 24" width={20} height={20} fill={color || 'rgba(255,255,255,0.4)'}>
     <Path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z" />
   </Svg>
 );
 
 export default function SettingsScreen({ navigation }) {
-  const { colors, updateColors, resetColors } = useTheme();
+  const { colors, updateColors, resetColors, isDarkMode, toggleDarkMode } = useTheme();
   const [showPrimaryPicker, setShowPrimaryPicker] = useState(false);
   const [showSecondaryPicker, setShowSecondaryPicker] = useState(false);
-  const [toggleStates, setToggleStates] = useState({
-    notifications: true,
-    location: true,
-    darkMode: true,
-  });
+  const [notifications, setNotifications] = useState(true);
+  const [location, setLocation] = useState(true);
 
-  const handleToggle = (id) => {
-    setToggleStates(prev => ({ ...prev, [id]: !prev[id] }));
+  useEffect(() => {
+    loadPreferences();
+  }, []);
+
+  const loadPreferences = async () => {
+    try {
+      const [savedNotifications, savedLocation] = await Promise.all([
+        AsyncStorage.getItem('notifications'),
+        AsyncStorage.getItem('location'),
+      ]);
+      if (savedNotifications !== null) setNotifications(JSON.parse(savedNotifications));
+      if (savedLocation !== null) setLocation(JSON.parse(savedLocation));
+    } catch (e) {
+      console.log('Error loading preferences');
+    }
+  };
+
+  const handleNotificationsToggle = async () => {
+    const newValue = !notifications;
+    setNotifications(newValue);
+    try {
+      await AsyncStorage.setItem('notifications', JSON.stringify(newValue));
+    } catch (e) {
+      console.log('Error saving notifications preference');
+    }
+  };
+
+  const handleLocationToggle = async () => {
+    const newValue = !location;
+    setLocation(newValue);
+    try {
+      await AsyncStorage.setItem('location', JSON.stringify(newValue));
+    } catch (e) {
+      console.log('Error saving location preference');
+    }
   };
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top']}>
       <View style={styles.header}>
-        <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-          <BackIcon />
+        <TouchableOpacity style={[styles.backButton, { backgroundColor: isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)' }]} onPress={() => navigation.goBack()}>
+          <BackIcon color={colors.text} />
         </TouchableOpacity>
         <Text style={[styles.headerTitle, { color: colors.text }]}>Settings</Text>
         <View style={styles.placeholder} />
@@ -51,7 +82,7 @@ export default function SettingsScreen({ navigation }) {
               <Text style={[styles.settingLabel, { color: colors.text }]}>Primary Color</Text>
               <View style={styles.colorPreviewRow}>
                 <View style={[styles.colorPreview, { backgroundColor: colors.primary }]} />
-                <ChevronRight />
+                <ChevronRight color={colors.textTertiary} />
               </View>
             </TouchableOpacity>
             <View style={[styles.divider, { backgroundColor: colors.cardBorder }]} />
@@ -59,7 +90,7 @@ export default function SettingsScreen({ navigation }) {
               <Text style={[styles.settingLabel, { color: colors.text }]}>Secondary Color</Text>
               <View style={styles.colorPreviewRow}>
                 <View style={[styles.colorPreview, { backgroundColor: colors.secondary }]} />
-                <ChevronRight />
+                <ChevronRight color={colors.textTertiary} />
               </View>
             </TouchableOpacity>
             <View style={[styles.divider, { backgroundColor: colors.cardBorder }]} />
@@ -89,7 +120,7 @@ export default function SettingsScreen({ navigation }) {
               <View key={item.label}>
                 <TouchableOpacity style={styles.settingItem} onPress={item.action}>
                   <Text style={[styles.settingLabel, { color: colors.text }]}>{item.label}</Text>
-                  <ChevronRight />
+                  <ChevronRight color={colors.textTertiary} />
                 </TouchableOpacity>
                 {i < 2 && <View style={[styles.divider, { backgroundColor: colors.cardBorder }]} />}
               </View>
@@ -101,24 +132,35 @@ export default function SettingsScreen({ navigation }) {
         <View style={styles.section}>
           <Text style={[styles.sectionTitle, { color: colors.textSecondary }]}>Preferences</Text>
           <View style={[styles.sectionContent, { backgroundColor: colors.card, borderColor: colors.cardBorder }]}>
-            {[
-              { id: 'notifications', label: 'Push Notifications' },
-              { id: 'location', label: 'Location Services' },
-              { id: 'darkMode', label: 'Dark Mode' },
-            ].map((item, i) => (
-              <View key={item.id}>
-                <View style={styles.settingItem}>
-                  <Text style={[styles.settingLabel, { color: colors.text }]}>{item.label}</Text>
-                  <Switch
-                    value={toggleStates[item.id]}
-                    onValueChange={() => handleToggle(item.id)}
-                    trackColor={{ false: 'rgba(255,255,255,0.2)', true: colors.primary }}
-                    thumbColor="#FFF"
-                  />
-                </View>
-                {i < 2 && <View style={[styles.divider, { backgroundColor: colors.cardBorder }]} />}
-              </View>
-            ))}
+            <View style={styles.settingItem}>
+              <Text style={[styles.settingLabel, { color: colors.text }]}>Push Notifications</Text>
+              <Switch
+                value={notifications}
+                onValueChange={handleNotificationsToggle}
+                trackColor={{ false: isDarkMode ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.2)', true: colors.primary }}
+                thumbColor="#FFF"
+              />
+            </View>
+            <View style={[styles.divider, { backgroundColor: colors.cardBorder }]} />
+            <View style={styles.settingItem}>
+              <Text style={[styles.settingLabel, { color: colors.text }]}>Location Services</Text>
+              <Switch
+                value={location}
+                onValueChange={handleLocationToggle}
+                trackColor={{ false: isDarkMode ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.2)', true: colors.primary }}
+                thumbColor="#FFF"
+              />
+            </View>
+            <View style={[styles.divider, { backgroundColor: colors.cardBorder }]} />
+            <View style={styles.settingItem}>
+              <Text style={[styles.settingLabel, { color: colors.text }]}>Dark Mode</Text>
+              <Switch
+                value={isDarkMode}
+                onValueChange={toggleDarkMode}
+                trackColor={{ false: isDarkMode ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.2)', true: colors.primary }}
+                thumbColor="#FFF"
+              />
+            </View>
           </View>
         </View>
 
@@ -175,7 +217,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.md, paddingVertical: spacing.md,
   },
   backButton: {
-    width: 40, height: 40, borderRadius: 20, backgroundColor: 'rgba(255,255,255,0.1)',
+    width: 40, height: 40, borderRadius: 20,
     justifyContent: 'center', alignItems: 'center',
   },
   headerTitle: { fontSize: 20, fontWeight: '700' },
