@@ -2,8 +2,9 @@ services:
   - type: web
     name: burnout-app
     env: static
+    rootDir: ReactNative
     buildCommand: npm install && npx expo export:web
-    staticPublishPath: ./dist
+    staticPublishPath: dist
     headers:
       - path: /*
         name: Cache-Control
