@@ -1,10 +1,11 @@
 import React, { useState, useRef } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Animated } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Animated, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import Svg, { Path } from 'react-native-svg';
 import Header from '../components/Header';
 import FilterPills from '../components/FilterPills';
+import SearchBar from '../components/SearchBar';
 import { routes } from '../data/appData';
 import { useTheme } from '../context/ThemeContext';
 import { spacing, borderRadius } from '../styles/theme';
@@ -96,16 +97,31 @@ function RouteCard({ route, onPress, colors }) {
 export default function RoutesScreen({ navigation }) {
   const { colors } = useTheme();
   const [activeFilter, setActiveFilter] = useState('all');
+  const [showSearch, setShowSearch] = useState(false);
+  const [searchText, setSearchText] = useState('');
+
+  const filteredRoutes = routes.filter(route => {
+    const matchesFilter = activeFilter === 'all' || route.name.toLowerCase().includes(activeFilter);
+    const matchesSearch = !searchText || route.name.toLowerCase().includes(searchText.toLowerCase());
+    return matchesFilter && matchesSearch;
+  });
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top']}>
       <Header
         title="Routes"
         rightIcon={<SearchIcon />}
-        onRightPress={() => {}}
+        onRightPress={() => setShowSearch(!showSearch)}
       />
 
       <ScrollView style={styles.scroll} showsVerticalScrollIndicator={false}>
+        {showSearch && (
+          <SearchBar
+            value={searchText}
+            onChangeText={setSearchText}
+            placeholder="Search routes..."
+          />
+        )}
         <Text style={[styles.sectionTitle, { color: colors.textSecondary }]}>Popular Routes</Text>
         <FilterPills
           filters={filters}
@@ -114,7 +130,7 @@ export default function RoutesScreen({ navigation }) {
         />
 
         <View style={styles.listContainer}>
-          {routes.map((route) => (
+          {filteredRoutes.map((route) => (
             <RouteCard key={route.id} route={route} colors={colors} onPress={() => navigation.navigate('RouteDetail', { route })} />
           ))}
         </View>

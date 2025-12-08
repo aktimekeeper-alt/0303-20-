@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Alert, Animated } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Alert, Animated, Linking } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import Svg, { Path } from 'react-native-svg';
@@ -130,7 +130,22 @@ export default function EventsScreen({ navigation }) {
           <BackIcon />
         </TouchableOpacity>
         <Text style={[styles.headerTitle, { color: colors.text }]}>Events</Text>
-        <TouchableOpacity style={styles.headerRight}>
+        <TouchableOpacity
+          style={styles.headerRight}
+          onPress={() => {
+            Alert.alert(
+              'Add to Calendar',
+              'Would you like to sync events with your calendar?',
+              [
+                { text: 'Cancel', style: 'cancel' },
+                {
+                  text: 'Open Calendar',
+                  onPress: () => Linking.openURL('calshow:'),
+                },
+              ]
+            );
+          }}
+        >
           <CalendarIcon />
         </TouchableOpacity>
       </View>

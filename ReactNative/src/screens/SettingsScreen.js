@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Switch } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Switch, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Path } from 'react-native-svg';
 import { useTheme } from '../context/ThemeContext';
@@ -73,10 +73,22 @@ export default function SettingsScreen({ navigation }) {
         <View style={styles.section}>
           <Text style={[styles.sectionTitle, { color: colors.textSecondary }]}>Account</Text>
           <View style={[styles.sectionContent, { backgroundColor: colors.card, borderColor: colors.cardBorder }]}>
-            {['Edit Profile', 'Privacy', 'Security'].map((label, i) => (
-              <View key={label}>
-                <TouchableOpacity style={styles.settingItem}>
-                  <Text style={[styles.settingLabel, { color: colors.text }]}>{label}</Text>
+            {[
+              { label: 'Edit Profile', action: () => Alert.alert('Edit Profile', 'Profile editing will be available soon!') },
+              { label: 'Privacy', action: () => Alert.alert('Privacy Settings', 'Choose who can see your posts and profile.', [
+                { text: 'Cancel', style: 'cancel' },
+                { text: 'Public', onPress: () => Alert.alert('Updated', 'Profile set to Public') },
+                { text: 'Friends Only', onPress: () => Alert.alert('Updated', 'Profile set to Friends Only') },
+              ]) },
+              { label: 'Security', action: () => Alert.alert('Security', 'Manage your account security.', [
+                { text: 'Cancel', style: 'cancel' },
+                { text: 'Change Password', onPress: () => Alert.alert('Coming Soon', 'Password change will be available soon!') },
+                { text: 'Two-Factor Auth', onPress: () => Alert.alert('Coming Soon', '2FA will be available soon!') },
+              ]) },
+            ].map((item, i) => (
+              <View key={item.label}>
+                <TouchableOpacity style={styles.settingItem} onPress={item.action}>
+                  <Text style={[styles.settingLabel, { color: colors.text }]}>{item.label}</Text>
                   <ChevronRight />
                 </TouchableOpacity>
                 {i < 2 && <View style={[styles.divider, { backgroundColor: colors.cardBorder }]} />}
@@ -121,7 +133,19 @@ export default function SettingsScreen({ navigation }) {
           </View>
         </View>
 
-        <TouchableOpacity style={styles.logoutButton}>
+        <TouchableOpacity
+          style={styles.logoutButton}
+          onPress={() => {
+            Alert.alert(
+              'Log Out',
+              'Are you sure you want to log out?',
+              [
+                { text: 'Cancel', style: 'cancel' },
+                { text: 'Log Out', style: 'destructive', onPress: () => Alert.alert('Logged Out', 'You have been logged out successfully.') },
+              ]
+            );
+          }}
+        >
           <Text style={styles.logoutText}>Log Out</Text>
         </TouchableOpacity>
       </ScrollView>

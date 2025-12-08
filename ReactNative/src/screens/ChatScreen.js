@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Path } from 'react-native-svg';
 import Header from '../components/Header';
@@ -73,7 +73,17 @@ export default function ChatScreen({ navigation }) {
       <Header
         title="Messages"
         rightIcon={<EditIcon />}
-        onRightPress={() => {}}
+        onRightPress={() => {
+          Alert.alert(
+            'New Message',
+            'Start a new conversation?',
+            [
+              { text: 'Cancel', style: 'cancel' },
+              { text: 'New Chat', onPress: () => Alert.alert('Coming Soon', 'New chat feature will be available soon!') },
+              { text: 'New Group', onPress: () => Alert.alert('Coming Soon', 'Group creation will be available soon!') },
+            ]
+          );
+        }}
       />
 
       <ScrollView style={styles.scroll} showsVerticalScrollIndicator={false}>
