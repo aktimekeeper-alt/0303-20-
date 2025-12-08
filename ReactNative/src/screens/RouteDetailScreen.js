@@ -1,9 +1,10 @@
-import React from 'react';
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Linking, Alert, Share, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import Svg, { Path } from 'react-native-svg';
-import { colors, spacing, borderRadius, shadows } from '../styles/theme';
+import { useTheme } from '../context/ThemeContext';
+import { spacing, borderRadius, shadows } from '../styles/theme';
 
 const BackIcon = () => (
   <Svg viewBox="0 0 24 24" width={24} height={24} fill="white">
@@ -23,9 +24,12 @@ const NavigateIcon = () => (
   </Svg>
 );
 
-const SaveIcon = () => (
-  <Svg viewBox="0 0 24 24" width={24} height={24} fill="white">
-    <Path d="M17 3H7c-1.1 0-1.99.9-1.99 2L5 21l7-3 7 3V5c0-1.1-.9-2-2-2z" />
+const SaveIcon = ({ filled }) => (
+  <Svg viewBox="0 0 24 24" width={24} height={24} fill={filled ? "#007AFF" : "white"}>
+    <Path d={filled
+      ? "M17 3H7c-1.1 0-1.99.9-1.99 2L5 21l7-3 7 3V5c0-1.1-.9-2-2-2z"
+      : "M17 3H7c-1.1 0-1.99.9-1.99 2L5 21l7-3 7 3V5c0-1.1-.9-2-2-2zm0 15l-5-2.18L7 18V5h10v13z"
+    } />
   </Svg>
 );
 
@@ -35,13 +39,17 @@ const ShareIcon = () => (
   </Svg>
 );
 
-const LocationIcon = () => (
-  <Svg viewBox="0 0 24 24" width={20} height={20} fill={colors.primary}>
+const LocationIcon = ({ color }) => (
+  <Svg viewBox="0 0 24 24" width={20} height={20} fill={color}>
     <Path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" />
   </Svg>
 );
 
 export default function RouteDetailScreen({ navigation, route }) {
+  const { colors } = useTheme();
+  const [isSaved, setIsSaved] = useState(false);
+  const [isNavigating, setIsNavigating] = useState(false);
+
   const routeData = route.params?.route || {
     id: 1,
     name: 'Angeles Crest Highway',
@@ -53,10 +61,76 @@ export default function RouteDetailScreen({ navigation, route }) {
     elevation: '+5,200 ft',
     difficulty: 'Intermediate',
     waypoints: ['La Canada', 'Mt Wilson', 'Wrightwood'],
+    coordinates: { lat: 34.2356, lng: -118.1367 },
+  };
+
+  const handleStartNavigation = async () => {
+    setIsNavigating(true);
+
+    const lat = routeData.coordinates?.lat || 34.2356;
+    const lng = routeData.coordinates?.lng || -118.1367;
+    const label = encodeURIComponent(routeData.name);
+
+    // Try different map apps
+    const urls = Platform.select({
+      ios: [
+        `maps://app?daddr=${lat},${lng}&dirflg=d`,
+        `comgooglemaps://?daddr=${lat},${lng}&directionsmode=driving`,
+        `waze://?ll=${lat},${lng}&navigate=yes`,
+      ],
+      android: [
+        `google.navigation:q=${lat},${lng}`,
+        `waze://?ll=${lat},${lng}&navigate=yes`,
+        `geo:${lat},${lng}?q=${lat},${lng}(${label})`,
+      ],
+      default: [`https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`],
+    });
+
+    let opened = false;
+    for (const url of urls) {
+      try {
+        const supported = await Linking.canOpenURL(url);
+        if (supported) {
+          await Linking.openURL(url);
+          opened = true;
+          break;
+        }
+      } catch (e) {
+        continue;
+      }
+    }
+
+    if (!opened) {
+      // Fallback to web maps
+      const webUrl = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`;
+      await Linking.openURL(webUrl);
+    }
+
+    setIsNavigating(false);
+  };
+
+  const handleSave = () => {
+    setIsSaved(!isSaved);
+    Alert.alert(
+      isSaved ? 'Route Removed' : 'Route Saved',
+      isSaved ? 'Route removed from your saved routes.' : 'Route added to your saved routes!',
+      [{ text: 'OK' }]
+    );
+  };
+
+  const handleShare = async () => {
+    try {
+      await Share.share({
+        message: `Check out this driving route: ${routeData.name}\n\n${routeData.description}\n\nDistance: ${routeData.distance}\nDuration: ${routeData.duration}`,
+        title: routeData.name,
+      });
+    } catch (error) {
+      Alert.alert('Error', 'Unable to share route');
+    }
   };
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top']}>
       <View style={styles.header}>
         <TouchableOpacity
           style={styles.backButton}
@@ -64,66 +138,67 @@ export default function RouteDetailScreen({ navigation, route }) {
         >
           <BackIcon />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Route Details</Text>
+        <Text style={[styles.headerTitle, { color: colors.text }]}>Route Details</Text>
         <View style={styles.placeholder} />
       </View>
 
       <ScrollView style={styles.scroll} showsVerticalScrollIndicator={false}>
         <View style={styles.mapPlaceholder}>
           <LinearGradient
-            colors={[colors.primary, colors.success]}
+            colors={[colors.primary, colors.secondary]}
             style={styles.mapGradient}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
           />
           <View style={styles.mapOverlay}>
-            <Text style={styles.mapText}>Map View</Text>
+            <LocationIcon color="#FFF" />
+            <Text style={styles.mapText}>Tap Start Navigation to open maps</Text>
           </View>
         </View>
 
         <View style={styles.content}>
-          <Text style={styles.routeName}>{routeData.name}</Text>
+          <Text style={[styles.routeName, { color: colors.text }]}>{routeData.name}</Text>
           <View style={styles.ratingRow}>
             <StarIcon />
-            <Text style={styles.ratingText}>
+            <Text style={[styles.ratingText, { color: colors.textSecondary }]}>
               {routeData.rating} ({routeData.reviews} reviews)
             </Text>
           </View>
 
-          <Text style={styles.description}>{routeData.description}</Text>
+          <Text style={[styles.description, { color: colors.textSecondary }]}>{routeData.description}</Text>
 
-          <View style={styles.statsGrid}>
+          <View style={[styles.statsGrid, { backgroundColor: colors.card, borderColor: colors.cardBorder }]}>
             <View style={styles.statItem}>
-              <Text style={styles.statLabel}>Distance</Text>
-              <Text style={styles.statValue}>{routeData.distance}</Text>
+              <Text style={[styles.statLabel, { color: colors.textSecondary }]}>Distance</Text>
+              <Text style={[styles.statValue, { color: colors.text }]}>{routeData.distance}</Text>
             </View>
             <View style={styles.statItem}>
-              <Text style={styles.statLabel}>Duration</Text>
-              <Text style={styles.statValue}>{routeData.duration}</Text>
+              <Text style={[styles.statLabel, { color: colors.textSecondary }]}>Duration</Text>
+              <Text style={[styles.statValue, { color: colors.text }]}>{routeData.duration}</Text>
             </View>
             <View style={styles.statItem}>
-              <Text style={styles.statLabel}>Elevation</Text>
-              <Text style={styles.statValue}>{routeData.elevation}</Text>
+              <Text style={[styles.statLabel, { color: colors.textSecondary }]}>Elevation</Text>
+              <Text style={[styles.statValue, { color: colors.text }]}>{routeData.elevation}</Text>
             </View>
             <View style={styles.statItem}>
-              <Text style={styles.statLabel}>Difficulty</Text>
-              <Text style={styles.statValue}>{routeData.difficulty}</Text>
+              <Text style={[styles.statLabel, { color: colors.textSecondary }]}>Difficulty</Text>
+              <Text style={[styles.statValue, { color: colors.text }]}>{routeData.difficulty}</Text>
             </View>
           </View>
 
-          <Text style={styles.sectionTitle}>Waypoints</Text>
-          <View style={styles.waypointsList}>
+          <Text style={[styles.sectionTitle, { color: colors.textSecondary }]}>Waypoints</Text>
+          <View style={[styles.waypointsList, { backgroundColor: colors.card, borderColor: colors.cardBorder }]}>
             {routeData.waypoints.map((waypoint, index) => (
               <View key={index} style={styles.waypointItem}>
-                <View style={styles.waypointIcon}>
-                  <LocationIcon />
+                <View style={[styles.waypointIcon, { backgroundColor: `${colors.primary}33` }]}>
+                  <LocationIcon color={colors.primary} />
                 </View>
                 <View style={styles.waypointContent}>
-                  <Text style={styles.waypointName}>{waypoint}</Text>
-                  <Text style={styles.waypointIndex}>Stop {index + 1}</Text>
+                  <Text style={[styles.waypointName, { color: colors.text }]}>{waypoint}</Text>
+                  <Text style={[styles.waypointIndex, { color: colors.textSecondary }]}>Stop {index + 1}</Text>
                 </View>
                 {index < routeData.waypoints.length - 1 && (
-                  <View style={styles.waypointLine} />
+                  <View style={[styles.waypointLine, { backgroundColor: `${colors.primary}4D` }]} />
                 )}
               </View>
             ))}
@@ -131,16 +206,28 @@ export default function RouteDetailScreen({ navigation, route }) {
         </View>
       </ScrollView>
 
-      <View style={styles.bottomActions}>
-        <TouchableOpacity style={styles.secondaryButton}>
-          <SaveIcon />
+      <View style={[styles.bottomActions, { borderTopColor: colors.cardBorder, backgroundColor: colors.background }]}>
+        <TouchableOpacity
+          style={[styles.secondaryButton, { backgroundColor: colors.card, borderColor: colors.cardBorder }]}
+          onPress={handleSave}
+        >
+          <SaveIcon filled={isSaved} />
         </TouchableOpacity>
-        <TouchableOpacity style={styles.secondaryButton}>
+        <TouchableOpacity
+          style={[styles.secondaryButton, { backgroundColor: colors.card, borderColor: colors.cardBorder }]}
+          onPress={handleShare}
+        >
           <ShareIcon />
         </TouchableOpacity>
-        <TouchableOpacity style={styles.primaryButton}>
+        <TouchableOpacity
+          style={[styles.primaryButton, { backgroundColor: colors.primary, opacity: isNavigating ? 0.7 : 1 }]}
+          onPress={handleStartNavigation}
+          disabled={isNavigating}
+        >
           <NavigateIcon />
-          <Text style={styles.primaryButtonText}>Start Navigation</Text>
+          <Text style={[styles.primaryButtonText, { color: colors.text }]}>
+            {isNavigating ? 'Opening...' : 'Start Navigation'}
+          </Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>
@@ -150,7 +237,6 @@ export default function RouteDetailScreen({ navigation, route }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
   },
   header: {
     flexDirection: 'row',
@@ -175,7 +261,6 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 18,
     fontWeight: '700',
-    color: colors.text,
   },
   placeholder: {
     width: 40,
@@ -195,12 +280,12 @@ const styles = StyleSheet.create({
     ...StyleSheet.absoluteFillObject,
     justifyContent: 'center',
     alignItems: 'center',
+    gap: 8,
   },
   mapText: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: colors.text,
-    opacity: 0.6,
+    fontSize: 14,
+    fontWeight: '500',
+    color: 'rgba(255,255,255,0.8)',
   },
   content: {
     padding: spacing.md,
@@ -208,7 +293,6 @@ const styles = StyleSheet.create({
   routeName: {
     fontSize: 28,
     fontWeight: '700',
-    color: colors.text,
     marginBottom: spacing.xs,
   },
   ratingRow: {
@@ -219,21 +303,17 @@ const styles = StyleSheet.create({
   },
   ratingText: {
     fontSize: 15,
-    color: colors.textSecondary,
   },
   description: {
     fontSize: 16,
-    color: colors.textSecondary,
     lineHeight: 24,
     marginBottom: spacing.lg,
   },
   statsGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    backgroundColor: colors.card,
     borderRadius: borderRadius.lg,
     borderWidth: 1,
-    borderColor: colors.cardBorder,
     padding: spacing.md,
     marginBottom: spacing.lg,
   },
@@ -243,7 +323,6 @@ const styles = StyleSheet.create({
   },
   statLabel: {
     fontSize: 13,
-    color: colors.textSecondary,
     textTransform: 'uppercase',
     letterSpacing: 0.5,
     marginBottom: spacing.xs,
@@ -251,21 +330,17 @@ const styles = StyleSheet.create({
   statValue: {
     fontSize: 18,
     fontWeight: '700',
-    color: colors.text,
   },
   sectionTitle: {
     fontSize: 13,
     fontWeight: '600',
-    color: colors.textSecondary,
     textTransform: 'uppercase',
     letterSpacing: 1,
     marginBottom: spacing.sm,
   },
   waypointsList: {
-    backgroundColor: colors.card,
     borderRadius: borderRadius.lg,
     borderWidth: 1,
-    borderColor: colors.cardBorder,
     padding: spacing.md,
     marginBottom: spacing.xl,
   },
@@ -279,7 +354,6 @@ const styles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: 18,
-    backgroundColor: 'rgba(0, 122, 255, 0.2)',
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: spacing.md,
@@ -290,11 +364,9 @@ const styles = StyleSheet.create({
   waypointName: {
     fontSize: 16,
     fontWeight: '600',
-    color: colors.text,
   },
   waypointIndex: {
     fontSize: 13,
-    color: colors.textSecondary,
     marginTop: 2,
   },
   waypointLine: {
@@ -303,23 +375,18 @@ const styles = StyleSheet.create({
     top: 40,
     width: 2,
     height: 20,
-    backgroundColor: 'rgba(0, 122, 255, 0.3)',
   },
   bottomActions: {
     flexDirection: 'row',
     padding: spacing.md,
     gap: spacing.sm,
     borderTopWidth: 1,
-    borderTopColor: colors.cardBorder,
-    backgroundColor: colors.background,
   },
   secondaryButton: {
     width: 50,
     height: 50,
     borderRadius: borderRadius.lg,
-    backgroundColor: colors.card,
     borderWidth: 1,
-    borderColor: colors.cardBorder,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -329,7 +396,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: spacing.sm,
-    backgroundColor: colors.primary,
     borderRadius: borderRadius.lg,
     paddingVertical: spacing.md,
     ...shadows.button,
@@ -337,6 +403,5 @@ const styles = StyleSheet.create({
   primaryButtonText: {
     fontSize: 16,
     fontWeight: '600',
-    color: colors.text,
   },
 });
