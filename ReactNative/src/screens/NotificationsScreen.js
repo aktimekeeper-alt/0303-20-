@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Path } from 'react-native-svg';
@@ -34,58 +34,13 @@ const EventIcon = () => (
   </Svg>
 );
 
-const notifications = [
-  {
-    id: 1,
-    type: 'like',
-    user: '@boost_junkie',
-    action: 'liked your post',
-    target: 'New Turbo Install',
-    time: '5m ago',
-    read: false,
-  },
-  {
-    id: 2,
-    type: 'comment',
-    user: '@mountain_carver',
-    action: 'commented on',
-    target: 'Sunday Canyon Run',
-    time: '15m ago',
-    read: false,
-  },
-  {
-    id: 3,
-    type: 'follow',
-    user: '@track_star',
-    action: 'started following you',
-    time: '1h ago',
-    read: false,
-  },
-  {
-    id: 4,
-    type: 'event',
-    user: 'SoCal Drivers Club',
-    action: 'invited you to',
-    target: 'Sunset Canyon Run',
-    time: '2h ago',
-    read: true,
-  },
-  {
-    id: 5,
-    type: 'like',
-    user: '@auto_lens',
-    action: 'liked your comment',
-    time: '3h ago',
-    read: true,
-  },
-  {
-    id: 6,
-    type: 'comment',
-    user: '@lap_timer',
-    action: 'replied to your comment',
-    time: '5h ago',
-    read: true,
-  },
+const initialNotifications = [
+  { id: 1, type: 'like', user: '@boost_junkie', action: 'liked', target: 'GT35R Mounted', time: '5m', read: false },
+  { id: 2, type: 'comment', user: '@mountain_carver', action: 'commented on', target: 'Sunday Twisties', time: '15m', read: false },
+  { id: 3, type: 'follow', user: '@track_star', action: 'followed you', time: '1h', read: false },
+  { id: 4, type: 'event', user: 'SoCal Drivers', action: 'invited you to', target: 'Sunset Run', time: '2h', read: true },
+  { id: 5, type: 'like', user: '@auto_lens', action: 'liked your comment', time: '3h', read: true },
+  { id: 6, type: 'comment', user: '@lap_timer', action: 'replied', time: '5h', read: true },
 ];
 
 const iconMap = {
@@ -102,14 +57,25 @@ const colorMap = {
   event: 'rgba(255, 149, 0, 0.2)',
 };
 
-function NotificationItem({ notification }) {
-  return (
+export default function NotificationsScreen({ navigation }) {
+  const [notifications, setNotifications] = useState(initialNotifications);
+
+  const markAsRead = (id) => {
+    setNotifications(prev => prev.map(n => n.id === id ? { ...n, read: true } : n));
+  };
+
+  const markAllRead = () => {
+    setNotifications(prev => prev.map(n => ({ ...n, read: true })));
+  };
+
+  const unreadNotifications = notifications.filter(n => !n.read);
+  const readNotifications = notifications.filter(n => n.read);
+
+  const NotificationItem = ({ notification }) => (
     <TouchableOpacity
-      style={[
-        styles.notificationItem,
-        !notification.read && styles.unreadItem,
-      ]}
+      style={[styles.notificationItem, !notification.read && styles.unreadItem]}
       activeOpacity={0.7}
+      onPress={() => markAsRead(notification.id)}
     >
       <View style={[styles.iconContainer, { backgroundColor: colorMap[notification.type] }]}>
         {iconMap[notification.type]}
@@ -118,153 +84,80 @@ function NotificationItem({ notification }) {
         <Text style={styles.notificationText}>
           <Text style={styles.username}>{notification.user}</Text>
           {' '}{notification.action}
-          {notification.target && (
-            <Text style={styles.target}> "{notification.target}"</Text>
-          )}
+          {notification.target && <Text style={styles.target}> {notification.target}</Text>}
         </Text>
         <Text style={styles.time}>{notification.time}</Text>
       </View>
       {!notification.read && <View style={styles.unreadDot} />}
     </TouchableOpacity>
   );
-}
-
-export default function NotificationsScreen({ navigation }) {
-  const unreadCount = notifications.filter(n => !n.read).length;
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
       <View style={styles.header}>
-        <TouchableOpacity
-          style={styles.backButton}
-          onPress={() => navigation.goBack()}
-        >
+        <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
           <BackIcon />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Notifications</Text>
-        <View style={styles.placeholder} />
+        <TouchableOpacity onPress={markAllRead}>
+          <Text style={styles.markAllText}>Mark all</Text>
+        </TouchableOpacity>
       </View>
 
       <ScrollView style={styles.scroll} showsVerticalScrollIndicator={false}>
-        {unreadCount > 0 && (
+        {unreadNotifications.length > 0 && (
           <View style={styles.unreadSection}>
-            <Text style={styles.sectionTitle}>New ({unreadCount})</Text>
+            <Text style={styles.sectionTitle}>New</Text>
             <View style={styles.listContainer}>
-              {notifications.filter(n => !n.read).map((notification) => (
-                <NotificationItem key={notification.id} notification={notification} />
-              ))}
+              {unreadNotifications.map((n) => <NotificationItem key={n.id} notification={n} />)}
             </View>
           </View>
         )}
 
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Earlier</Text>
-          <View style={styles.listContainer}>
-            {notifications.filter(n => n.read).map((notification) => (
-              <NotificationItem key={notification.id} notification={notification} />
-            ))}
+        {readNotifications.length > 0 && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Earlier</Text>
+            <View style={styles.listContainer}>
+              {readNotifications.map((n) => <NotificationItem key={n.id} notification={n} />)}
+            </View>
           </View>
-        </View>
+        )}
       </ScrollView>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
+  container: { flex: 1, backgroundColor: colors.background },
   header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.md,
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
+    paddingHorizontal: spacing.md, paddingVertical: spacing.md,
   },
   backButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
-    justifyContent: 'center',
-    alignItems: 'center',
+    width: 40, height: 40, borderRadius: 20, backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    justifyContent: 'center', alignItems: 'center',
   },
-  headerTitle: {
-    fontSize: 24,
-    fontWeight: '700',
-    color: colors.text,
-  },
-  placeholder: {
-    width: 40,
-  },
-  scroll: {
-    flex: 1,
-  },
-  section: {
-    marginBottom: spacing.lg,
-  },
-  unreadSection: {
-    marginBottom: spacing.lg,
-  },
+  headerTitle: { fontSize: 20, fontWeight: '700', color: colors.text },
+  markAllText: { fontSize: 14, color: colors.primary, fontWeight: '600' },
+  scroll: { flex: 1 },
+  section: { marginBottom: spacing.lg },
+  unreadSection: { marginBottom: spacing.lg },
   sectionTitle: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: colors.textSecondary,
-    textTransform: 'uppercase',
-    letterSpacing: 1,
-    paddingHorizontal: spacing.md,
-    marginBottom: spacing.sm,
+    fontSize: 12, fontWeight: '600', color: colors.textSecondary, textTransform: 'uppercase',
+    letterSpacing: 1, paddingHorizontal: spacing.md, marginBottom: spacing.sm,
   },
-  listContainer: {
-    paddingHorizontal: spacing.md,
-  },
+  listContainer: { paddingHorizontal: spacing.md },
   notificationItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: colors.card,
-    borderRadius: borderRadius.lg,
-    borderWidth: 1,
-    borderColor: colors.cardBorder,
-    padding: spacing.md,
-    marginBottom: spacing.sm,
+    flexDirection: 'row', alignItems: 'center', backgroundColor: colors.card,
+    borderRadius: borderRadius.lg, borderWidth: 1, borderColor: colors.cardBorder,
+    padding: spacing.md, marginBottom: spacing.sm,
   },
-  unreadItem: {
-    borderColor: 'rgba(0, 122, 255, 0.3)',
-    backgroundColor: 'rgba(0, 122, 255, 0.05)',
-  },
-  iconContainer: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  content: {
-    flex: 1,
-    marginLeft: spacing.md,
-    marginRight: spacing.sm,
-  },
-  notificationText: {
-    fontSize: 15,
-    color: colors.text,
-    lineHeight: 20,
-  },
-  username: {
-    fontWeight: '600',
-  },
-  target: {
-    color: colors.primary,
-  },
-  time: {
-    fontSize: 13,
-    color: colors.textSecondary,
-    marginTop: spacing.xs,
-  },
-  unreadDot: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-    backgroundColor: colors.primary,
-  },
+  unreadItem: { borderColor: 'rgba(0, 122, 255, 0.3)', backgroundColor: 'rgba(0, 122, 255, 0.05)' },
+  iconContainer: { width: 44, height: 44, borderRadius: 22, justifyContent: 'center', alignItems: 'center' },
+  content: { flex: 1, marginLeft: spacing.md, marginRight: spacing.sm },
+  notificationText: { fontSize: 14, color: colors.text, lineHeight: 20 },
+  username: { fontWeight: '600' },
+  target: { color: colors.primary },
+  time: { fontSize: 12, color: colors.textSecondary, marginTop: 2 },
+  unreadDot: { width: 8, height: 8, borderRadius: 4, backgroundColor: colors.primary },
 });
