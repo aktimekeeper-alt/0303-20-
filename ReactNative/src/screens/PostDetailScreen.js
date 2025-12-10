@@ -4,6 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import Svg, { Path } from 'react-native-svg';
 import { useTheme } from '../context/ThemeContext';
+import { useSaved } from '../context/SavedContext';
 import { spacing, borderRadius } from '../styles/theme';
 
 const BackIcon = () => (
@@ -30,6 +31,12 @@ const ShareIcon = ({ color }) => (
   </Svg>
 );
 
+const BookmarkIcon = ({ color, filled }) => (
+  <Svg viewBox="0 0 24 24" width={22} height={22} fill={filled ? color : 'none'} stroke={color} strokeWidth={2}>
+    <Path d="M17 3H7c-1.1 0-2 .9-2 2v16l7-3 7 3V5c0-1.1-.9-2-2-2z" />
+  </Svg>
+);
+
 const initialComments = [
   { id: 1, user: '@speed_demon', text: 'Clean setup', time: '1h', likes: 12, liked: false },
   { id: 2, user: '@turbo_tech', text: 'What boost?', time: '2h', likes: 8, liked: false },
@@ -38,6 +45,7 @@ const initialComments = [
 
 export default function PostDetailScreen({ navigation, route }) {
   const { colors } = useTheme();
+  const { isPostSaved, toggleSavePost } = useSaved();
   const post = route.params?.post || {
     id: 1, title: 'GT35R Mounted', author: '@boost_junkie', time: '2h',
     description: '450whp on pump. Tuning next week.', category: 'builds',
@@ -50,9 +58,11 @@ export default function PostDetailScreen({ navigation, route }) {
   const [commentText, setCommentText] = useState('');
   const [comments, setComments] = useState(initialComments);
   const [shareCount, setShareCount] = useState(post.shares);
+  const saved = isPostSaved(post.id);
 
   const likeScale = useRef(new Animated.Value(1)).current;
   const shareScale = useRef(new Animated.Value(1)).current;
+  const saveScale = useRef(new Animated.Value(1)).current;
   const sendScale = useRef(new Animated.Value(1)).current;
 
   const animatePress = (animation, callback) => {
@@ -98,6 +108,12 @@ export default function PostDetailScreen({ navigation, route }) {
       } catch (error) {
         Alert.alert('Error', 'Unable to share post');
       }
+    });
+  };
+
+  const handleSave = () => {
+    animatePress(saveScale, () => {
+      toggleSavePost(post);
     });
   };
 
@@ -148,6 +164,12 @@ export default function PostDetailScreen({ navigation, route }) {
                 <TouchableOpacity style={styles.actionButton} onPress={sharePost}>
                   <ShareIcon color={colors.text} />
                   <Text style={[styles.actionText, { color: colors.text }]}>{shareCount}</Text>
+                </TouchableOpacity>
+              </Animated.View>
+              <Animated.View style={{ transform: [{ scale: saveScale }] }}>
+                <TouchableOpacity style={styles.actionButton} onPress={handleSave}>
+                  <BookmarkIcon filled={saved} color={saved ? colors.primary : colors.text} />
+                  <Text style={[styles.actionText, { color: saved ? colors.primary : colors.text }]}>{saved ? 'Saved' : 'Save'}</Text>
                 </TouchableOpacity>
               </Animated.View>
             </View>
