@@ -3,6 +3,7 @@ import { View, Text, TouchableOpacity, StyleSheet, Animated } from 'react-native
 import { LinearGradient } from 'expo-linear-gradient';
 import Svg, { Path } from 'react-native-svg';
 import { useTheme } from '../context/ThemeContext';
+import { useSaved } from '../context/SavedContext';
 import { spacing, borderRadius } from '../styles/theme';
 
 const HeartIcon = ({ color }) => (
@@ -23,9 +24,17 @@ const ShareIcon = ({ color }) => (
   </Svg>
 );
 
+const BookmarkIcon = ({ color, filled }) => (
+  <Svg viewBox="0 0 24 24" width={16} height={16} fill={filled ? color : 'none'} stroke={color} strokeWidth={2}>
+    <Path d="M17 3H7c-1.1 0-2 .9-2 2v16l7-3 7 3V5c0-1.1-.9-2-2-2z" />
+  </Svg>
+);
+
 export default function ContentCard({ post, onPress }) {
   const { colors } = useTheme();
+  const { isPostSaved, toggleSavePost } = useSaved();
   const scaleAnim = useRef(new Animated.Value(1)).current;
+  const saved = isPostSaved(post.id);
 
   const handlePressIn = () => {
     Animated.spring(scaleAnim, { toValue: 0.98, friction: 3, useNativeDriver: true }).start();
@@ -33,6 +42,11 @@ export default function ContentCard({ post, onPress }) {
 
   const handlePressOut = () => {
     Animated.spring(scaleAnim, { toValue: 1, friction: 3, useNativeDriver: true }).start();
+  };
+
+  const handleSave = (e) => {
+    e.stopPropagation();
+    toggleSavePost(post);
   };
 
   return (
@@ -76,6 +90,12 @@ export default function ContentCard({ post, onPress }) {
               <ShareIcon color={colors.textSecondary} />
               <Text style={[styles.statText, { color: colors.textSecondary }]}>{post.shares}</Text>
             </View>
+            <TouchableOpacity style={styles.stat} onPress={handleSave}>
+              <BookmarkIcon color={saved ? colors.primary : colors.textSecondary} filled={saved} />
+              <Text style={[styles.statText, { color: saved ? colors.primary : colors.textSecondary }]}>
+                {saved ? 'Saved' : 'Save'}
+              </Text>
+            </TouchableOpacity>
           </View>
         </View>
       </TouchableOpacity>
