@@ -28,7 +28,6 @@ export default function LoginScreen({ navigation }) {
   const { colors } = useTheme();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [isLogin, setIsLogin] = useState(true);
 
   const buttonScale = useRef(new Animated.Value(1)).current;
   const logoScale = useRef(new Animated.Value(1)).current;
@@ -43,7 +42,7 @@ export default function LoginScreen({ navigation }) {
     ).start();
   }, []);
 
-  const handlePress = () => {
+  const handleLogin = () => {
     Animated.sequence([
       Animated.timing(buttonScale, { toValue: 0.95, duration: 100, useNativeDriver: true }),
       Animated.timing(buttonScale, { toValue: 1, duration: 100, useNativeDriver: true }),
@@ -52,19 +51,12 @@ export default function LoginScreen({ navigation }) {
         Alert.alert('Missing Info', 'Please enter email and password');
         return;
       }
-      if (isLogin) {
-        // Navigate to main app
-        navigation.replace('Main');
-      } else {
-        Alert.alert('Account Created!', 'Welcome to Burnout! You can now sign in.', [
-          { text: 'OK', onPress: () => setIsLogin(true) }
-        ]);
-      }
+      navigation.replace('Main');
     });
   };
 
-  const toggleMode = () => {
-    setIsLogin(!isLogin);
+  const handleSignUp = () => {
+    navigation.navigate('SignUp');
   };
 
   return (
@@ -95,9 +87,7 @@ export default function LoginScreen({ navigation }) {
 
           {/* Form */}
           <View style={styles.formContainer}>
-            <Text style={[styles.formTitle, { color: colors.text }]}>
-              {isLogin ? 'Welcome Back' : 'Create Account'}
-            </Text>
+            <Text style={[styles.formTitle, { color: colors.text }]}>Welcome Back</Text>
 
             <View style={[styles.inputContainer, { backgroundColor: colors.card, borderColor: colors.cardBorder }]}>
               <EmailIcon color={colors.textSecondary} />
@@ -124,24 +114,20 @@ export default function LoginScreen({ navigation }) {
               />
             </View>
 
-            {isLogin && (
-              <TouchableOpacity
-                style={styles.forgotButton}
-                onPress={() => Alert.alert('Reset Password', 'Password reset link sent to your email!')}
-              >
-                <Text style={[styles.forgotText, { color: colors.primary }]}>Forgot Password?</Text>
-              </TouchableOpacity>
-            )}
+            <TouchableOpacity
+              style={styles.forgotButton}
+              onPress={() => Alert.alert('Reset Password', 'Password reset link sent to your email!')}
+            >
+              <Text style={[styles.forgotText, { color: colors.primary }]}>Forgot Password?</Text>
+            </TouchableOpacity>
 
             <Animated.View style={{ transform: [{ scale: buttonScale }] }}>
               <TouchableOpacity
                 style={[styles.mainButton, { backgroundColor: colors.primary }]}
-                onPress={handlePress}
+                onPress={handleLogin}
                 activeOpacity={0.9}
               >
-                <Text style={styles.mainButtonText}>
-                  {isLogin ? 'Sign In' : 'Create Account'}
-                </Text>
+                <Text style={styles.mainButtonText}>Sign In</Text>
               </TouchableOpacity>
             </Animated.View>
 
@@ -166,15 +152,13 @@ export default function LoginScreen({ navigation }) {
             </TouchableOpacity>
           </View>
 
-          {/* Toggle Login/Signup */}
+          {/* Sign Up Link */}
           <View style={styles.toggleContainer}>
             <Text style={[styles.toggleText, { color: colors.textSecondary }]}>
-              {isLogin ? "Don't have an account?" : "Already have an account?"}
+              Don't have an account?
             </Text>
-            <TouchableOpacity onPress={toggleMode}>
-              <Text style={[styles.toggleLink, { color: colors.primary }]}>
-                {isLogin ? ' Sign Up' : ' Sign In'}
-              </Text>
+            <TouchableOpacity onPress={handleSignUp}>
+              <Text style={[styles.toggleLink, { color: colors.primary }]}> Sign Up</Text>
             </TouchableOpacity>
           </View>
         </KeyboardAvoidingView>
