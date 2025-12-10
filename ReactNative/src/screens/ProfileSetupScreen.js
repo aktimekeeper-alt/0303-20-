@@ -39,7 +39,7 @@ export default function ProfileSetupScreen({ navigation, route }) {
       Animated.timing(buttonScale, { toValue: 0.95, duration: 100, useNativeDriver: true }),
       Animated.timing(buttonScale, { toValue: 1, duration: 100, useNativeDriver: true }),
     ]).start(() => {
-      navigation.navigate('CarSetup', {
+      navigation.navigate('Interests', {
         username,
         email,
         password,
@@ -51,7 +51,7 @@ export default function ProfileSetupScreen({ navigation, route }) {
   };
 
   const handleSkip = () => {
-    navigation.navigate('CarSetup', {
+    navigation.navigate('Interests', {
       username,
       email,
       password,
