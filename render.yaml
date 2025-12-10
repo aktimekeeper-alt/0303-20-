@@ -4,7 +4,7 @@ services:
     env: static
     rootDir: ReactNative
     buildCommand: npm install && npx expo export:web
-    staticPublishPath: dist
+    staticPublishPath: web-build
     headers:
       - path: /*
         name: Cache-Control
