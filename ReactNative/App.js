@@ -19,6 +19,7 @@ import ChatDetailScreen from './src/screens/ChatDetailScreen';
 import RouteDetailScreen from './src/screens/RouteDetailScreen';
 import EventDetailScreen from './src/screens/EventDetailScreen';
 import ModDetailScreen from './src/screens/ModDetailScreen';
+import LoginScreen from './src/screens/LoginScreen';
 
 import { ThemeProvider, useTheme } from './src/context/ThemeContext';
 import { SavedProvider } from './src/context/SavedContext';
@@ -130,7 +131,8 @@ function AppContent() {
             cardStyle: { backgroundColor: colors.background },
           }}
         >
-          <Stack.Screen name="MainTabs" component={MainTabs} />
+          <Stack.Screen name="Login" component={LoginScreen} />
+          <Stack.Screen name="Main" component={MainTabs} />
           <Stack.Screen name="Events" component={EventsScreen} />
           <Stack.Screen name="Settings" component={SettingsScreen} />
           <Stack.Screen name="Notifications" component={NotificationsScreen} />
