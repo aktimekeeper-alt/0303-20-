@@ -20,6 +20,9 @@ import RouteDetailScreen from './src/screens/RouteDetailScreen';
 import EventDetailScreen from './src/screens/EventDetailScreen';
 import ModDetailScreen from './src/screens/ModDetailScreen';
 import LoginScreen from './src/screens/LoginScreen';
+import SignUpScreen from './src/screens/SignUpScreen';
+import ProfileSetupScreen from './src/screens/ProfileSetupScreen';
+import CarSetupScreen from './src/screens/CarSetupScreen';
 
 import { ThemeProvider, useTheme } from './src/context/ThemeContext';
 import { SavedProvider } from './src/context/SavedContext';
@@ -132,6 +135,9 @@ function AppContent() {
           }}
         >
           <Stack.Screen name="Login" component={LoginScreen} />
+          <Stack.Screen name="SignUp" component={SignUpScreen} />
+          <Stack.Screen name="ProfileSetup" component={ProfileSetupScreen} />
+          <Stack.Screen name="CarSetup" component={CarSetupScreen} />
           <Stack.Screen name="Main" component={MainTabs} />
           <Stack.Screen name="Events" component={EventsScreen} />
           <Stack.Screen name="Settings" component={SettingsScreen} />
