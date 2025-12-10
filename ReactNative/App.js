@@ -21,6 +21,7 @@ import EventDetailScreen from './src/screens/EventDetailScreen';
 import ModDetailScreen from './src/screens/ModDetailScreen';
 
 import { ThemeProvider, useTheme } from './src/context/ThemeContext';
+import { SavedProvider } from './src/context/SavedContext';
 import { colors as defaultColors } from './src/styles/theme';
 
 const Tab = createBottomTabNavigator();
@@ -147,7 +148,9 @@ function AppContent() {
 export default function App() {
   return (
     <ThemeProvider>
-      <AppContent />
+      <SavedProvider>
+        <AppContent />
+      </SavedProvider>
     </ThemeProvider>
   );
 }
