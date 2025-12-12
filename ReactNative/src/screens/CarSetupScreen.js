@@ -24,8 +24,12 @@ const currentYear = new Date().getFullYear();
 const years = Array.from({ length: 50 }, (_, i) => (currentYear - i).toString());
 
 export default function CarSetupScreen({ navigation, route }) {
-  const { colors } = useTheme();
-  const { username, email, password, displayName, bio, location } = route.params || {};
+  const { colors, isDarkMode } = useTheme();
+  const gradientColors = isDarkMode
+    ? [colors.background, '#0a0a0a']
+    : [colors.background, '#E5E5EA'];
+
+  const { username, email, password, displayName, bio, location, interests } = route.params || {};
 
   const [make, setMake] = useState('');
   const [model, setModel] = useState('');
@@ -35,61 +39,35 @@ export default function CarSetupScreen({ navigation, route }) {
 
   const buttonScale = useRef(new Animated.Value(1)).current;
 
-  const handleFinish = async () => {
+  const handleContinue = () => {
     Animated.sequence([
       Animated.timing(buttonScale, { toValue: 0.95, duration: 100, useNativeDriver: true }),
       Animated.timing(buttonScale, { toValue: 1, duration: 100, useNativeDriver: true }),
-    ]).start(async () => {
-      // Save user data
-      const userData = {
-        id: Date.now(),
-        username: `@${username}`,
+    ]).start(() => {
+      navigation.navigate('FollowSuggestions', {
+        username,
         email,
-        displayName: displayName || username,
+        password,
+        displayName,
         bio,
         location,
+        interests,
         car: make && model ? { make, model, year: parseInt(year) || null } : null,
-        stats: { posts: 0, followers: 0, following: 0, meetsAttended: 0, trackDays: 0 },
-        mods: [],
-        createdAt: new Date().toISOString(),
-      };
-
-      try {
-        await AsyncStorage.setItem('user', JSON.stringify(userData));
-        await AsyncStorage.setItem('isLoggedIn', 'true');
-
-        Alert.alert(
-          'Welcome to Burnout!',
-          'Your account has been created successfully.',
-          [{ text: 'Get Started', onPress: () => navigation.replace('Main') }]
-        );
-      } catch (error) {
-        Alert.alert('Error', 'Failed to create account. Please try again.');
-      }
+      });
     });
   };
 
-  const handleSkip = async () => {
-    const userData = {
-      id: Date.now(),
-      username: `@${username}`,
+  const handleSkip = () => {
+    navigation.navigate('FollowSuggestions', {
+      username,
       email,
-      displayName: displayName || username,
+      password,
+      displayName,
       bio,
       location,
+      interests,
       car: null,
-      stats: { posts: 0, followers: 0, following: 0, meetsAttended: 0, trackDays: 0 },
-      mods: [],
-      createdAt: new Date().toISOString(),
-    };
-
-    try {
-      await AsyncStorage.setItem('user', JSON.stringify(userData));
-      await AsyncStorage.setItem('isLoggedIn', 'true');
-      navigation.replace('Main');
-    } catch (error) {
-      Alert.alert('Error', 'Failed to create account. Please try again.');
-    }
+    });
   };
 
   const filteredMakes = make
@@ -97,7 +75,7 @@ export default function CarSetupScreen({ navigation, route }) {
     : popularMakes;
 
   return (
-    <LinearGradient colors={[colors.background, '#0a0a0a']} style={styles.gradient}>
+    <LinearGradient colors={gradientColors} style={styles.gradient}>
       <SafeAreaView style={styles.container}>
         <KeyboardAvoidingView
           behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -248,7 +226,7 @@ export default function CarSetupScreen({ navigation, route }) {
             <Animated.View style={{ transform: [{ scale: buttonScale }] }}>
               <TouchableOpacity
                 style={[styles.finishButton, { backgroundColor: colors.primary }]}
-                onPress={handleFinish}
+                onPress={handleContinue}
                 activeOpacity={0.9}
               >
                 <Text style={styles.finishButtonText}>

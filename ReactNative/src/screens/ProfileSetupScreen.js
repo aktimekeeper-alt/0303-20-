@@ -25,8 +25,12 @@ const LocationIcon = ({ color }) => (
 );
 
 export default function ProfileSetupScreen({ navigation, route }) {
-  const { colors } = useTheme();
+  const { colors, isDarkMode } = useTheme();
   const { username, email, password } = route.params || {};
+
+  const gradientColors = isDarkMode
+    ? [colors.background, '#0a0a0a']
+    : [colors.background, '#E5E5EA'];
 
   const [displayName, setDisplayName] = useState('');
   const [bio, setBio] = useState('');
@@ -39,7 +43,7 @@ export default function ProfileSetupScreen({ navigation, route }) {
       Animated.timing(buttonScale, { toValue: 0.95, duration: 100, useNativeDriver: true }),
       Animated.timing(buttonScale, { toValue: 1, duration: 100, useNativeDriver: true }),
     ]).start(() => {
-      navigation.navigate('CarSetup', {
+      navigation.navigate('Interests', {
         username,
         email,
         password,
@@ -51,7 +55,7 @@ export default function ProfileSetupScreen({ navigation, route }) {
   };
 
   const handleSkip = () => {
-    navigation.navigate('CarSetup', {
+    navigation.navigate('Interests', {
       username,
       email,
       password,
@@ -62,7 +66,7 @@ export default function ProfileSetupScreen({ navigation, route }) {
   };
 
   return (
-    <LinearGradient colors={[colors.background, '#0a0a0a']} style={styles.gradient}>
+    <LinearGradient colors={gradientColors} style={styles.gradient}>
       <SafeAreaView style={styles.container}>
         <KeyboardAvoidingView
           behavior={Platform.OS === 'ios' ? 'padding' : 'height'}

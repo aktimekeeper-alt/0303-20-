@@ -37,7 +37,11 @@ const CheckIcon = ({ color }) => (
 );
 
 export default function SignUpScreen({ navigation }) {
-  const { colors } = useTheme();
+  const { colors, isDarkMode } = useTheme();
+  const gradientColors = isDarkMode
+    ? [colors.background, '#0a0a0a']
+    : [colors.background, '#E5E5EA'];
+
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -96,7 +100,7 @@ export default function SignUpScreen({ navigation }) {
   const strength = getPasswordStrength();
 
   return (
-    <LinearGradient colors={[colors.background, '#0a0a0a']} style={styles.gradient}>
+    <LinearGradient colors={gradientColors} style={styles.gradient}>
       <SafeAreaView style={styles.container}>
         <KeyboardAvoidingView
           behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
