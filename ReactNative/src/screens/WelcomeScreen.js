@@ -64,7 +64,11 @@ const slides = [
 ];
 
 export default function WelcomeScreen({ navigation }) {
-  const { colors } = useTheme();
+  const { colors, isDarkMode } = useTheme();
+  const gradientColors = isDarkMode
+    ? [colors.background, '#0a0a0a']
+    : [colors.background, '#E5E5EA'];
+
   const [currentIndex, setCurrentIndex] = useState(0);
   const flatListRef = useRef(null);
   const scrollX = useRef(new Animated.Value(0)).current;
@@ -159,7 +163,7 @@ export default function WelcomeScreen({ navigation }) {
   );
 
   return (
-    <LinearGradient colors={[colors.background, '#0a0a0a']} style={styles.gradient}>
+    <LinearGradient colors={gradientColors} style={styles.gradient}>
       <SafeAreaView style={styles.container}>
         {/* Skip Button */}
         <TouchableOpacity style={styles.skipButton} onPress={handleSkip}>

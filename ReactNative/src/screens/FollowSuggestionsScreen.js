@@ -89,7 +89,11 @@ const suggestedUsers = [
 ];
 
 export default function FollowSuggestionsScreen({ navigation, route }) {
-  const { colors } = useTheme();
+  const { colors, isDarkMode } = useTheme();
+  const gradientColors = isDarkMode
+    ? [colors.background, '#0a0a0a']
+    : [colors.background, '#E5E5EA'];
+
   const params = route.params || {};
   const [following, setFollowing] = useState([]);
   const buttonScale = useRef(new Animated.Value(1)).current;
@@ -140,7 +144,7 @@ export default function FollowSuggestionsScreen({ navigation, route }) {
   };
 
   return (
-    <LinearGradient colors={[colors.background, '#0a0a0a']} style={styles.gradient}>
+    <LinearGradient colors={gradientColors} style={styles.gradient}>
       <SafeAreaView style={styles.container}>
         {/* Header */}
         <View style={styles.header}>

@@ -34,7 +34,11 @@ const interests = [
 ];
 
 export default function InterestsScreen({ navigation, route }) {
-  const { colors } = useTheme();
+  const { colors, isDarkMode } = useTheme();
+  const gradientColors = isDarkMode
+    ? [colors.background, '#0a0a0a']
+    : [colors.background, '#E5E5EA'];
+
   const { username, email, password, displayName, bio, location } = route.params || {};
   const [selected, setSelected] = useState([]);
 
@@ -76,7 +80,7 @@ export default function InterestsScreen({ navigation, route }) {
   };
 
   return (
-    <LinearGradient colors={[colors.background, '#0a0a0a']} style={styles.gradient}>
+    <LinearGradient colors={gradientColors} style={styles.gradient}>
       <SafeAreaView style={styles.container}>
         {/* Header */}
         <View style={styles.header}>

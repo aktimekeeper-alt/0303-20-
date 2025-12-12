@@ -24,7 +24,11 @@ const currentYear = new Date().getFullYear();
 const years = Array.from({ length: 50 }, (_, i) => (currentYear - i).toString());
 
 export default function CarSetupScreen({ navigation, route }) {
-  const { colors } = useTheme();
+  const { colors, isDarkMode } = useTheme();
+  const gradientColors = isDarkMode
+    ? [colors.background, '#0a0a0a']
+    : [colors.background, '#E5E5EA'];
+
   const { username, email, password, displayName, bio, location, interests } = route.params || {};
 
   const [make, setMake] = useState('');
@@ -71,7 +75,7 @@ export default function CarSetupScreen({ navigation, route }) {
     : popularMakes;
 
   return (
-    <LinearGradient colors={[colors.background, '#0a0a0a']} style={styles.gradient}>
+    <LinearGradient colors={gradientColors} style={styles.gradient}>
       <SafeAreaView style={styles.container}>
         <KeyboardAvoidingView
           behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
