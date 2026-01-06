@@ -97,6 +97,13 @@ export default function ProfileScreen({ navigation }) {
   const tabAnimation = useRef(new Animated.Value(0)).current;
   const profile = profiles[0];
 
+  // Get car info (handle both flat and nested structure)
+  const carModel = profile.carModel || (profile.car ? `${profile.car.year} ${profile.car.make} ${profile.car.model}` : 'No Car');
+  const carYear = profile.year || (profile.car ? profile.car.year : '');
+  const horsePower = profile.horsePower || (profile.car ? profile.car.horsePower : 0);
+  const topSpeed = profile.topSpeed || (profile.car ? profile.car.topSpeed : 0);
+  const mods = profile.mods || [];
+
   const stats = [
     { key: 'posts', value: profile.stats.posts, label: 'Posts', color: `${colors.primary}33`, link: 'Home' },
     { key: 'followers', value: formatNumber(profile.stats.followers), label: 'Followers', color: `${colors.secondary}33`, link: 'Chat' },
@@ -192,18 +199,18 @@ export default function ProfileScreen({ navigation }) {
               end={{ x: 1, y: 1 }}
             >
               <View>
-                <Text style={[styles.carModel, { color: colors.text }]}>{profile.carModel}</Text>
-                <Text style={styles.carYear}>{profile.year}</Text>
+                <Text style={[styles.carModel, { color: colors.text }]}>{carModel}</Text>
+                <Text style={styles.carYear}>{carYear}</Text>
                 <Text style={styles.username}>{profile.username}</Text>
               </View>
               <View style={styles.carStatsRow}>
                 <View style={styles.carStatBox}>
                   <Text style={styles.carStatLabel}>HP</Text>
-                  <Text style={[styles.carStatValue, { color: colors.text }]}>{profile.horsePower}</Text>
+                  <Text style={[styles.carStatValue, { color: colors.text }]}>{horsePower}</Text>
                 </View>
                 <View style={styles.carStatBox}>
                   <Text style={styles.carStatLabel}>Top Speed</Text>
-                  <Text style={[styles.carStatValue, { color: colors.text }]}>{profile.topSpeed}</Text>
+                  <Text style={[styles.carStatValue, { color: colors.text }]}>{topSpeed}</Text>
                 </View>
               </View>
             </LinearGradient>
@@ -290,21 +297,25 @@ export default function ProfileScreen({ navigation }) {
         {/* Modifications */}
         <Text style={[styles.sectionTitle, { color: colors.textSecondary }]}>Modifications</Text>
         <View style={styles.modsContainer}>
-          {profile.mods.map((mod, index) => (
-            <TouchableOpacity
-              key={index}
-              style={[styles.modItem, { backgroundColor: colors.card, borderColor: colors.cardBorder }]}
-              activeOpacity={0.7}
-              onPress={() => navigation.navigate('ModDetail', { mod: { name: mod, category: 'Performance', brand: 'Various', installedDate: 'Recently', notes: `Modification: ${mod}` } })}
-            >
-              <ToolIcon color={colors.primary} />
-              <View style={styles.modContent}>
-                <Text style={[styles.modTitle, { color: colors.text }]} numberOfLines={1}>{mod}</Text>
-                <Text style={[styles.modSubtitle, { color: colors.textSecondary }]}>Mod {index + 1} of {profile.mods.length}</Text>
-              </View>
-              <Text style={[styles.modArrow, { color: colors.textTertiary }]}>›</Text>
-            </TouchableOpacity>
-          ))}
+          {mods.map((mod, index) => {
+            const modName = typeof mod === 'string' ? mod : mod.name;
+            const modCategory = typeof mod === 'string' ? 'Performance' : (mod.category || 'Performance');
+            return (
+              <TouchableOpacity
+                key={mod.id || index}
+                style={[styles.modItem, { backgroundColor: colors.card, borderColor: colors.cardBorder }]}
+                activeOpacity={0.7}
+                onPress={() => navigation.navigate('ModDetail', { mod: { name: modName, category: modCategory, brand: 'Various', installedDate: 'Recently', notes: `Modification: ${modName}` } })}
+              >
+                <ToolIcon color={colors.primary} />
+                <View style={styles.modContent}>
+                  <Text style={[styles.modTitle, { color: colors.text }]} numberOfLines={1}>{modName}</Text>
+                  <Text style={[styles.modSubtitle, { color: colors.textSecondary }]}>{modCategory}</Text>
+                </View>
+                <Text style={[styles.modArrow, { color: colors.textTertiary }]}>›</Text>
+              </TouchableOpacity>
+            );
+          })}
         </View>
       </ScrollView>
     </SafeAreaView>
