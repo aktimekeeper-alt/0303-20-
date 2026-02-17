@@ -5,6 +5,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import Svg, { Path } from 'react-native-svg';
 import { useTheme } from '../context/ThemeContext';
 import { spacing, borderRadius } from '../styles/theme';
+import { authService } from '../services';
 
 const CarIcon = ({ color }) => (
   <Svg viewBox="0 0 24 24" width={48} height={48} fill={color}>
@@ -46,16 +47,27 @@ export default function LoginScreen({ navigation }) {
     ).start();
   }, []);
 
-  const handleLogin = () => {
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleLogin = async () => {
     Animated.sequence([
       Animated.timing(buttonScale, { toValue: 0.95, duration: 100, useNativeDriver: true }),
       Animated.timing(buttonScale, { toValue: 1, duration: 100, useNativeDriver: true }),
-    ]).start(() => {
+    ]).start(async () => {
       if (!email || !password) {
         Alert.alert('Missing Info', 'Please enter email and password');
         return;
       }
-      navigation.replace('Main');
+
+      setIsLoading(true);
+      try {
+        await authService.login(email, password);
+        navigation.replace('Main');
+      } catch (error) {
+        Alert.alert('Login Failed', error.message || 'Please check your credentials');
+      } finally {
+        setIsLoading(false);
+      }
     });
   };
 
@@ -128,7 +140,7 @@ export default function LoginScreen({ navigation }) {
                 onPress={handleLogin}
                 activeOpacity={0.9}
               >
-                <Text style={styles.mainButtonText}>Sign In</Text>
+                <Text style={styles.mainButtonText}>{isLoading ? 'Signing In...' : 'Sign In'}</Text>
               </TouchableOpacity>
             </Animated.View>
 

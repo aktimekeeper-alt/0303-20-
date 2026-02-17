@@ -3,9 +3,9 @@ import { View, Text, TouchableOpacity, StyleSheet, Animated, ScrollView, Alert }
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import Svg, { Path } from 'react-native-svg';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useTheme } from '../context/ThemeContext';
 import { spacing, borderRadius } from '../styles/theme';
+import { authService } from '../services';
 
 const BackIcon = ({ color }) => (
   <Svg viewBox="0 0 24 24" width={24} height={24} fill={color}>
@@ -108,37 +108,38 @@ export default function FollowSuggestionsScreen({ navigation, route }) {
     setFollowing(suggestedUsers.map((u) => u.id));
   };
 
+  const [isLoading, setIsLoading] = useState(false);
+
   const handleFinish = async () => {
     Animated.sequence([
       Animated.timing(buttonScale, { toValue: 0.95, duration: 100, useNativeDriver: true }),
       Animated.timing(buttonScale, { toValue: 1, duration: 100, useNativeDriver: true }),
     ]).start(async () => {
-      const userData = {
-        id: Date.now(),
-        username: `@${params.username}`,
-        email: params.email,
-        displayName: params.displayName || params.username,
-        bio: params.bio || '',
-        location: params.location || '',
-        car: params.car || null,
-        interests: params.interests || [],
-        following: following.map((id) => suggestedUsers.find((u) => u.id === id)?.username),
-        stats: { posts: 0, followers: 0, following: following.length, meetsAttended: 0, trackDays: 0 },
-        mods: [],
-        createdAt: new Date().toISOString(),
-      };
+      setIsLoading(true);
 
       try {
-        await AsyncStorage.setItem('user', JSON.stringify(userData));
-        await AsyncStorage.setItem('isLoggedIn', 'true');
+        // Sign up with authService
+        await authService.signup({
+          username: params.username,
+          email: params.email,
+          password: params.password,
+          displayName: params.displayName || params.username,
+          bio: params.bio || '',
+          location: params.location || '',
+          car: params.car || null,
+          interests: params.interests || [],
+          following: following.map((id) => suggestedUsers.find((u) => u.id === id)?.username).filter(Boolean),
+        });
 
         Alert.alert(
-          'Welcome to Burnout! 🎉',
+          'Welcome to Burnout!',
           `You're all set, ${params.displayName || params.username}! Start exploring the community.`,
           [{ text: "Let's Go!", onPress: () => navigation.replace('Main') }]
         );
       } catch (error) {
-        Alert.alert('Error', 'Failed to create account. Please try again.');
+        Alert.alert('Error', error.message || 'Failed to create account. Please try again.');
+      } finally {
+        setIsLoading(false);
       }
     });
   };
@@ -245,7 +246,7 @@ export default function FollowSuggestionsScreen({ navigation, route }) {
               activeOpacity={0.9}
             >
               <Text style={styles.finishButtonText}>
-                {following.length > 0 ? `Continue (${following.length} following)` : 'Skip & Finish'}
+                {isLoading ? 'Creating Account...' : following.length > 0 ? `Continue (${following.length} following)` : 'Skip & Finish'}
               </Text>
             </TouchableOpacity>
           </Animated.View>
