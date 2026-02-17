@@ -12,6 +12,7 @@ import PostScreen from './src/screens/PostScreen';
 import RoutesScreen from './src/screens/RoutesScreen';
 import ProfileScreen from './src/screens/ProfileScreen';
 import EventsScreen from './src/screens/EventsScreen';
+import NewsScreen from './src/screens/NewsScreen';
 import SettingsScreen from './src/screens/SettingsScreen';
 import NotificationsScreen from './src/screens/NotificationsScreen';
 import PostDetailScreen from './src/screens/PostDetailScreen';
@@ -64,6 +65,12 @@ const ProfileIcon = ({ color }) => (
   </Svg>
 );
 
+const NewsIcon = ({ color }) => (
+  <Svg viewBox="0 0 24 24" width={24} height={24} fill={color}>
+    <Path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM14 17H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z" />
+  </Svg>
+);
+
 function MainTabs() {
   const { colors } = useTheme();
   return (
@@ -87,17 +94,17 @@ function MainTabs() {
       }}
     >
       <Tab.Screen
+        name="Routes"
+        component={RoutesScreen}
+        options={{
+          tabBarIcon: ({ color }) => <RoutesIcon color={color} />,
+        }}
+      />
+      <Tab.Screen
         name="Home"
         component={HomeFeedScreen}
         options={{
           tabBarIcon: ({ color }) => <HomeIcon color={color} />,
-        }}
-      />
-      <Tab.Screen
-        name="Chat"
-        component={ChatScreen}
-        options={{
-          tabBarIcon: ({ color }) => <ChatIcon color={color} />,
         }}
       />
       <Tab.Screen
@@ -108,17 +115,17 @@ function MainTabs() {
         }}
       />
       <Tab.Screen
-        name="Routes"
-        component={RoutesScreen}
+        name="News"
+        component={NewsScreen}
         options={{
-          tabBarIcon: ({ color }) => <RoutesIcon color={color} />,
+          tabBarIcon: ({ color }) => <NewsIcon color={color} />,
         }}
       />
       <Tab.Screen
-        name="Profile"
-        component={ProfileScreen}
+        name="Chat"
+        component={ChatScreen}
         options={{
-          tabBarIcon: ({ color }) => <ProfileIcon color={color} />,
+          tabBarIcon: ({ color }) => <ChatIcon color={color} />,
         }}
       />
     </Tab.Navigator>
@@ -153,6 +160,7 @@ function AppContent() {
           <Stack.Screen name="RouteDetail" component={RouteDetailScreen} />
           <Stack.Screen name="EventDetail" component={EventDetailScreen} />
           <Stack.Screen name="ModDetail" component={ModDetailScreen} />
+          <Stack.Screen name="UserProfile" component={ProfileScreen} />
         </Stack.Navigator>
       </NavigationContainer>
     </View>
