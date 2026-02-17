@@ -1,13 +1,20 @@
-import React, { useState, useRef } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Animated } from 'react-native';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
+import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Animated, RefreshControl } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import Svg, { Path, Rect } from 'react-native-svg';
 import Header from '../components/Header';
 import ContentCard from '../components/ContentCard';
-import { profiles, formatNumber, myPosts, likedPosts, savedPosts } from '../data/appData';
+import { profileService, feedService } from '../services';
 import { useTheme } from '../context/ThemeContext';
+import { useSaved } from '../context/SavedContext';
 import { spacing, borderRadius, shadows } from '../styles/theme';
+
+const formatNumber = (num) => {
+  if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
+  if (num >= 1000) return (num / 1000).toFixed(1) + 'K';
+  return num?.toString() || '0';
+};
 
 const SettingsIcon = () => (
   <Svg viewBox="0 0 24 24" width={20} height={20} fill="white">
@@ -91,11 +98,54 @@ const tabs = [
 
 export default function ProfileScreen({ navigation }) {
   const { colors } = useTheme();
+  const { savedPosts } = useSaved();
   const [isFlipped, setIsFlipped] = useState(false);
   const [activeTab, setActiveTab] = useState('posts');
+  const [profile, setProfile] = useState(null);
+  const [myPosts, setMyPosts] = useState([]);
+  const [likedPosts, setLikedPosts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const flipAnimation = useRef(new Animated.Value(0)).current;
   const tabAnimation = useRef(new Animated.Value(0)).current;
-  const profile = profiles[0];
+
+  const loadProfile = useCallback(async () => {
+    try {
+      const [profileData, postsData] = await Promise.all([
+        profileService.getProfile('me'),
+        feedService.getFeed(1),
+      ]);
+      setProfile(profileData);
+      // Filter posts by current user
+      setMyPosts(postsData.posts.filter(p => p.authorId === profileData.id).slice(0, 5));
+      setLikedPosts(postsData.posts.filter(p => p.isLiked).slice(0, 5));
+    } catch (error) {
+      console.error('Failed to load profile:', error);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadProfile();
+  }, [loadProfile]);
+
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    await loadProfile();
+    setRefreshing(false);
+  };
+
+  if (!profile) {
+    return (
+      <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top']}>
+        <Header title="Profile" />
+        <View style={styles.loadingContainer}>
+          <Text style={[styles.loadingText, { color: colors.textSecondary }]}>Loading...</Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   // Get car info (handle both flat and nested structure)
   const carModel = profile.carModel || (profile.car ? `${profile.car.year} ${profile.car.make} ${profile.car.model}` : 'No Car');
@@ -182,7 +232,13 @@ export default function ProfileScreen({ navigation }) {
         onRightPress={() => navigation.navigate('Settings')}
       />
 
-      <ScrollView style={styles.scroll} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        style={styles.scroll}
+        showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
+        }
+      >
         <Text style={[styles.sectionTitle, { color: colors.textSecondary }]}>My Garage</Text>
 
         {/* Animated Flip Card */}
@@ -325,6 +381,14 @@ export default function ProfileScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loadingText: {
+    fontSize: 16,
   },
   scroll: {
     flex: 1,

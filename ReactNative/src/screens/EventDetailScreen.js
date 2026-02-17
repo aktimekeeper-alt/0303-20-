@@ -3,9 +3,13 @@ import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Alert, Share, Ani
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import Svg, { Path } from 'react-native-svg';
-import { formatDate } from '../data/appData';
 import { useTheme } from '../context/ThemeContext';
 import { spacing, borderRadius, shadows } from '../styles/theme';
+
+const formatDate = (dateString) => {
+  const date = new Date(dateString);
+  return date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+};
 
 const BackIcon = () => (
   <Svg viewBox="0 0 24 24" width={24} height={24} fill="white">
